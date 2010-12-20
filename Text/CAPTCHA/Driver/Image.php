@@ -71,7 +71,8 @@ class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA
         'font_file'        => 'COUR.TTF',
         'text_color'       => '#000000',
         'lines_color'      => '#CACACA',
-        'background_color' => '#555555');
+        'background_color' => '#555555',
+        'antialias'        => false);
         
     /**
      * Whether the immage resource has been created
@@ -227,8 +228,13 @@ class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA
             $this->_error = PEAR::raiseError('The text provided does not fit in the image dimensions');
             return $this->_error;
         }
-        $this->_imt->render(); 
+        $this->_imt->render();
         $this->_im =& $this->_imt->getImg(); 
+
+        if ($this->_imageOptions['antialias'] && function_exists('imageantialias')) {
+            imageantialias($this->_im, true);
+        }
+
         $colors = $this->_imt->_convertString2RGB($this->_imageOptions['lines_color']);
         $lines_color = imagecolorallocate($this->_im, $colors['r'], $colors['g'], $colors['b']);
         //some obfuscation
