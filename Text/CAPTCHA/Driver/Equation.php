@@ -3,9 +3,9 @@
  *  Equation driver for Text_CAPTCHA.
  *  Returns simple equations as string, e.g. "9 - 2"
  *
+ *  @author  Christian Weiske <cweiske@php.net>
+ *  @author  Christian Wenz <wenz@php.net>
  *  @license BSD License
- *  @author Christian Weiske <cweiske@php.net>
- *  @author Christian Wenz <wenz@php.net>
  */
 require_once 'Text/CAPTCHA.php';
 
@@ -82,10 +82,13 @@ class Text_CAPTCHA_Driver_Equation extends Text_CAPTCHA
     /**
      * Initialize the driver.
      *
+     * @param array $options Optionally supply options for initialisation
+     *
      * @access public
      * @return true on success, PEAR_Error on error.
      */
-    function init($options = array()) {
+    function init($options = array())
+    {
         if (isset($options['min'])) {
             $this->_min = (int)$options['min'];
         } else {
@@ -130,21 +133,21 @@ class Text_CAPTCHA_Driver_Equation extends Text_CAPTCHA
     function _createPhrase()
     {
         switch ($this->_severity) {
-            case 1:
-                list($this->_equation, $this->_phrase) = $this->_createSimpleEquation();
-                break;
+        case 1:
+            list($this->_equation, $this->_phrase) = $this->_createSimpleEquation();
+            break;
 
-            case 2:
-                list($eq1, $sol1) = $this->_createSimpleEquation();
-                list($eq2, $sol2) = $this->_createSimpleEquation();
-                $op3 = $this->_operators[rand(0, count($this->_operators) - 1)];
-                list($eq3, $this->_phrase) = $this->_solveSimpleEquation($sol1, $sol2, $op3);
-                $this->_equation = sprintf($op3, '(' . $eq1 . ')', '(' . $eq2 . ')');
-                break;
+        case 2:
+            list($eq1, $sol1) = $this->_createSimpleEquation();
+            list($eq2, $sol2) = $this->_createSimpleEquation();
+            $op3 = $this->_operators[rand(0, count($this->_operators) - 1)];
+            list($eq3, $this->_phrase) = $this->_solveSimpleEquation($sol1, $sol2, $op3);
+            $this->_equation = sprintf($op3, '(' . $eq1 . ')', '(' . $eq2 . ')');
+            break;
 
-            default:
-                $this->_error = PEAR::raiseError('Equation complexity of ' . $this->_severity . ' not supported', true);
-                return $this->_error;
+        default:
+            $this->_error = PEAR::raiseError('Equation complexity of ' . $this->_severity . ' not supported', true);
+            return $this->_error;
         }
         return true;
     }
@@ -169,6 +172,10 @@ class Text_CAPTCHA_Driver_Equation extends Text_CAPTCHA
      * and one operator as defined in $this->_operators.
      *
      * Also converts the numbers to words if required.
+     *
+     * @param int    $one      First number
+     * @param int    $two      Second number
+     * @param string $operator Operator used with those two numbers
      *
      * @access protected
      * @return array    Array with equation and solution
@@ -207,7 +214,8 @@ class Text_CAPTCHA_Driver_Equation extends Text_CAPTCHA
      * @access protected
      * @return PEAR_Error
      */
-    function _createCAPTCHA() {
+    function _createCAPTCHA()
+    {
         //is already done in _createPhrase();
     }
 
@@ -217,7 +225,8 @@ class Text_CAPTCHA_Driver_Equation extends Text_CAPTCHA
      * @access public
      * @return string
      */
-    function getCAPTCHA() {
+    function getCAPTCHA()
+    {
         return $this->_equation;
     }
 

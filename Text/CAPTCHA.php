@@ -5,12 +5,11 @@
  * Class to create a Turing test for websites by
  * creating an image, ASCII art or something else 
  * with some (obfuscated) characters 
- *
  * 
- * @package Text_CAPTCHA
- * @license BSD License
- * @author Christian Wenz <wenz@php.net>
  * @category Text
+ * @package  Text_CAPTCHA
+ * @author   Christian Wenz <wenz@php.net>
+ * @license  BSD License
  */
 
 
@@ -129,7 +128,8 @@ require_once 'Text/Password.php';
     ?>
 */
  
-class Text_CAPTCHA {
+class Text_CAPTCHA
+{
 
     /**
      * Version number
@@ -175,7 +175,10 @@ class Text_CAPTCHA {
      *
      * This method creates a random phrase, 8 characters long
      *
-     * @access  private
+     * @param array $options Optionally supply advanced options for the phrase-creation
+     *
+     * @access private
+     * @return void
      */
     function _createPhrase($options = array())
     {
@@ -210,9 +213,10 @@ class Text_CAPTCHA {
      * This method sets the CAPTCHA phrase 
      * (use null for a random phrase)
      *
-     * @access  public
-     * @param   string   $phrase    the (new) phrase
-     * @void 
+     * @param string $phrase The (new) phrase
+     *
+     * @access public
+     * @return void
      */
     function setPhrase($phrase = null)
     {
@@ -230,7 +234,8 @@ class Text_CAPTCHA {
      * @access private
      * @return PEAR_Error
      */
-    function init() {
+    function init()
+    {
         return PEAR::raiseError('CAPTCHA type not selected', true);
     }
 
@@ -241,7 +246,8 @@ class Text_CAPTCHA {
      * @access private
      * @return PEAR_Error
      */
-    function _createCAPTCHA() {
+    function _createCAPTCHA()
+    {
         return PEAR::raiseError('CAPTCHA type not selected', true);
     }
 
@@ -253,9 +259,9 @@ class Text_CAPTCHA {
      * @access private
      * @return PEAR_Error
      */
-    function getCAPTCHA() {
+    function getCAPTCHA()
+    {
         return PEAR::raiseError('CAPTCHA type not selected', true);
     }
-
 }
 ?>

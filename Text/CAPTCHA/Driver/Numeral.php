@@ -48,10 +48,10 @@ require_once 'Text/CAPTCHA.php';
  * Example:
  *  Give me the answer to "54 + 2" to prove that you are human.
  *
+ * @category Text
+ * @package  Text_CAPTCHA
  * @author   David Coallier <davidc@agoraproduction.com>
  * @author   Christian Wenz <wenz@php.net>
- * @package  Text_CAPTCHA
- * @category Text
  */
 class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
 {
@@ -158,6 +158,7 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      * and set the associated class properties
      *
      * @access private
+     * @return void
      */
     function _createCAPTCHA()
     { 
@@ -175,8 +176,10 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      * to set the range minimum value so the operations
      * can be bigger, smaller, etc.
      *
+     * @param integer $minValue The minimum value
+     *
      * @access private
-     * @param  integer $minValue The minimum value
+     * @return void
      */
     function _setRangeMinimum($minValue = 1) 
     {
@@ -192,6 +195,7 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      * function that generates a random number.
      * 
      * @access private
+     * @return void
      * @see    $this->_firstNumber, $this->_generateNumber
      */
     function _generateFirstNumber()
@@ -207,6 +211,7 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      * operation by calling _generateNumber()
      * 
      * @access private
+     * @return void
      * @see    $this->_secondNumber, $this->_generateNumber()
      */
     function _generateSecondNumber()
@@ -223,6 +228,7 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      * the $this->_operators() array.
      *
      * @access private
+     * @return void
      * @see    $this->_operators, $this->_operator
      */
     function _generateOperator()
@@ -238,8 +244,10 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      * basically the result of the function we have done 
      * and it will set $this->answer with it.
      * 
+     * @param integer $phraseValue The answer value
+     * 
      * @access private
-     * @param  integer $phraseValue The answer value
+     * @return void
      * @see    $this->_phrase
      */
     function _setPhrase($phraseValue)
@@ -254,8 +262,10 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      * This function sets the first number
      * to the value passed to the function
      *
+     * @param integer $value The first number value.
+     *
      * @access private
-     * @param  integer $value The first number value.
+     * @return void
      */
     function _setFirstNumber($value) 
     {
@@ -269,8 +279,10 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      * This function sets the second number
      * with the value passed to it.
      *
+     * @param integer $value The second number new value.
+     *
      * @access private
-     * @param  integer $value The second number new value.
+     * @return void
      */
     function _setSecondNumber($value)
     {
@@ -285,6 +297,7 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      * by taking the firstNumber, secondNumber and operator
      *
      * @access private
+     * @return void
      * @see    $this->_operation
      */
     function _setOperation()
@@ -319,6 +332,7 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      * set the answer value.
      * 
      * @access private
+     * @return void
      * @see    $this->_firstNumber, $this->_secondNumber, $this->_setAnswer()
      */
     function _doAdd()
@@ -339,21 +353,22 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      * then we regenerate the first number and regenerate the operation.
      * 
      * @access private
+     * @return void
      * @see    $this->_firstNumber, $this->_secondNumber, $this->_setAnswer()
      */
     function _doSubstract()
     {
         $first  = $this->_getFirstNumber();
         $second = $this->_getSecondNumber();
-		
+
         /**
          * Check if firstNumber is smaller than secondNumber
          */
-    if ($first < $second) {
-        $this->_setFirstNumber($second);
-        $this->_setSecondNumber($first);
-        $this->_setOperation();
-    }
+        if ($first < $second) {
+            $this->_setFirstNumber($second);
+            $this->_setSecondNumber($first);
+            $this->_setOperation();
+        }
 
         $phrase = $this->_getFirstNumber() - $this->_getSecondNumber();
         $this->_setPhrase($phrase);
@@ -369,6 +384,7 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      * depending on which operation is set by this->operator.
      * 
      * @access private
+     * @return void
      * @see    $this->_setOperation(), $this->_operator
      */
     function _generateOperation()
