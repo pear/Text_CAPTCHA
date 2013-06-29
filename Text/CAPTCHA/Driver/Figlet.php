@@ -114,7 +114,7 @@ class Text_CAPTCHA_Driver_Figlet extends Text_CAPTCHA
             
             if (!isset($options['phrase']) || empty($options['phrase'])) {
                 $phraseoptions = (isset($options['phraseOptions']) && is_array($options['phraseOptions'])) ? $options['phraseOptions'] : array();
-                $this->_createPhrase($options);
+                $this->_createPhrase($phraseoptions);
             } else {
                 $this->_phrase = $options['phrase'];
             }
