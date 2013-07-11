@@ -2,65 +2,72 @@
 /**
  * Text_CAPTCHA_Driver_Word - Text_CAPTCHA driver word CAPTCHAs
  *
- * Class to create a textual Turing test 
- * 
- * @author  Tobias Schlitt <schlitt@php.net>
- * @author  Christian Wenz <wenz@php.net>
- * @license BSD License
- */
-
-/**
+ * Class to create a textual Turing test
  *
- * Require Numbers_Words class for generating the text.
+ * PHP version 5
  *
+ * @category Text
+ * @package  Text_CAPTCHA
+ * @author   Tobias Schlitt <schlitt@php.net>
+ * @author   Christian Wenz <wenz@php.net>
+ * @author   Michael Cramer <michael@bigmichi1.de>
+ * @license  BSD License
+ * @link     http://pear.php.net/package/Text_CAPTCHA
  */
 require_once 'Text/CAPTCHA.php';
 require_once 'Numbers/Words.php';
-
+/**
+ * Require Numbers_Words class for generating the text.
+ *
+ * @category Text
+ * @package  Text_CAPTCHA
+ * @author   Tobias Schlitt <schlitt@php.net>
+ * @author   Christian Wenz <wenz@php.net>
+ * @author   Michael Cramer <michael@bigmichi1.de>
+ * @license  BSD License
+ * @link     http://pear.php.net/package/Text_CAPTCHA
+ */
 class Text_CAPTCHA_Driver_Word extends Text_CAPTCHA
 {
+    /**
+     * Phrase length.
+     *
+     * This variable holds the length of the Word.
+     *
+     * @var integer
+     */
+    private $_length;
 
     /**
-     * Phrase length
-     * 
-     * This variable holds the length of the Word
-     * 
-     * @access private
+     * Numbers_Words mode.
+     *
+     * This variable holds the mode for Numbers_Words.
+     *
+     * @var String
      */
-    var $_length;
-
-    /**
-     * Numbers_Words mode
-     * 
-     * This variable holds the mode for Numbers_Words
-     * 
-     * @access private
-     */
-    var $_mode;
+    private $_mode;
 
     /**
      * Locale
-     * 
+     *
      * This variable holds the locale for Numbers_Words
-     * 
-     * @access private
+     *
+     * @var string
      */
-    var $_locale;
+    private $_locale;
 
     /**
-     * init function
+     * Initializes the new Text_CAPTCHA_Driver_Word object.
      *
-     * Initializes the new Text_CAPTCHA_Driver_Word object
+     * @param array $options CAPTCHA options with these keys:<br>
+     *                       phrase  The "secret word" of the CAPTCHA<br>
+     *                       length  The number of characters in the phrase<br>
+     *                       locale  The locale for Numbers_Words<br>
+     *                       mode    The mode for Numbers_Words
      *
-     * @param array $options CAPTCHA options with these keys:
-     *               phrase  The "secret word" of the CAPTCHA
-     *               length  The number of characters in the phrase 
-     *               locale  The locale for Numbers_Words
-     *               mode    The mode for Numbers_Words
-     *
-     * @access public
+     * @return void
      */
-    function init($options = array()) 
+    function init($options = array())
     {
         if (isset($options['length']) && is_int($options['length'])) {
             $this->_length = $options['length'];
@@ -68,9 +75,9 @@ class Text_CAPTCHA_Driver_Word extends Text_CAPTCHA
             $this->_length = 4;
         }
         if (isset($options['phrase']) && !empty($options['phrase'])) {
-            $this->_phrase = (string)(int)$options['phrase'];
+            $this->setPhrase((string)$options['phrase']);
         } else {
-            $this->_createPhrase();
+            $this->createPhrase();
         }
         if (isset($options['mode']) && !empty($options['mode'])) {
             $this->_mode = $options['mode'];
@@ -82,39 +89,46 @@ class Text_CAPTCHA_Driver_Word extends Text_CAPTCHA
         } else {
             $this->_locale = 'en_US';
         }
+        parent::init($options);
     }
 
     /**
-     * Create random CAPTCHA phrase, "Word edition" (numbers only)
+     * Create random CAPTCHA phrase, "Word edition" (numbers only).
      *
      * This method creates a random phrase
      *
-     * @access  private
+     * @return void
      */
-    function _createPhrase()
+    protected function createPhrase()
     {
-        $this->_phrase = (string)Text_Password::create($this->_length, 'unpronounceable', 'numeric');
+        $phrase = new Text_Password();
+        $this->setPhrase(
+            $phrase->create(
+                $this->_length, 'unpronounceable', 'numeric'
+            )
+        );
     }
 
     /**
-     * Return CAPTCHA as a string
+     * Place holder for the real _createCAPTCHA() method
+     * used by extended classes to generate CAPTCHA from phrase
      *
-     * This method returns the CAPTCHA as string
-     *
-     * @access  public
-     * @return  text        string
+     * @return void
      */
-    function getCAPTCHA()
+    protected function createCAPTCHA()
     {
-        $res = ''; 
+        $res = '';
+        $numberWords = new Numbers_Words();
         if ($this->_mode == 'single') {
-            for ($i = 0; $i < strlen($this->_phrase); $i++) {
-                $res .= ' '.Numbers_Words::toWords($this->_phrase{$i}, $this->_locale);
+            for ($i = 0; $i < strlen($this->getPhrase()); $i++) {
+                $res .= ' ' .
+                    $numberWords->toWords(
+                        $this->getPhrase()[$i], $this->_locale
+                    );
             }
         } else {
-            $res = Numbers_Words::toWords($this->_phrase, $this->_locale);
+            $res = $numberWords->toWords($this->getPhrase(), $this->_locale);
         }
-        return $res;
+        $this->setCaptcha($res);
     }
 }
-?>

@@ -1,43 +1,32 @@
 <?php
 /**
- * Text_CAPTCHA - creates a CAPTCHA for Turing tests
+ * Text_CAPTCHA - creates a CAPTCHA for Turing tests.
  *
- * Class to create a Turing test for websites by
- * creating an image, ASCII art or something else 
- * with some (obfuscated) characters 
- * 
+ * Base class file for using Text_CAPTCHA.
+ *
+ * PHP version 5
+ *
  * @category Text
  * @package  Text_CAPTCHA
  * @author   Christian Wenz <wenz@php.net>
  * @license  BSD License
+ * @link     http://pear.php.net/package/Text_CAPTCHA
  */
 
-
 /**
- *
  * Require PEAR class for error handling.
- *
  */
 require_once 'PEAR.php';
-
 /**
- *
+ * Require Exception class for error handling.
+ */
+require_once 'Text/CAPTCHA/Exception.php';
+/**
  * Require Text_Password class for generating the phrase.
- *
  */
 require_once 'Text/Password.php';
 
-/**
- * Text_CAPTCHA - creates a CAPTCHA for Turing tests
- *
- * Class to create a Turing test for websites by
- * creating an image, ASCII art or something else 
- * with some (obfuscated) characters 
- *
- * @package Text_CAPTCHA
- */
- 
-/*  
+/*
     // This is a simple example script
 
     <?php
@@ -61,9 +50,10 @@ require_once 'Text/Password.php';
 
     if ($_SERVER['REQUEST_METHOD'] == 'POST') {
 
-        if (isset($_POST['phrase']) && is_string($_SESSION['phrase']) && isset($_SESSION['phrase']) &&
-            strlen($_POST['phrase']) > 0 && strlen($_SESSION['phrase']) > 0 &&
-            $_POST['phrase'] == $_SESSION['phrase']) {
+        if (isset($_POST['phrase']) && is_string($_SESSION['phrase'])
+            && isset($_SESSION['phrase'])
+            && strlen($_POST['phrase']) > 0 && strlen($_SESSION['phrase']) > 0
+            && $_POST['phrase'] == $_SESSION['phrase']) {
             $msg = 'OK!';
             $ok = true;
             unset($_SESSION['phrase']);
@@ -127,71 +117,90 @@ require_once 'Text/Password.php';
     }
     ?>
 */
- 
-class Text_CAPTCHA
+/**
+ * Text_CAPTCHA - creates a CAPTCHA for Turing tests.
+ *
+ * Class to create a Turing test for websites by creating an image, ASCII art or
+ * something else with some (obfuscated) characters.
+ *
+ * @category Text
+ * @package  Text_CAPTCHA
+ * @author   Christian Wenz <wenz@php.net>
+ * @author   Michael Cramer <michael@bigmichi1.de>
+ * @license  BSD License
+ * @link     http://pear.php.net/package/Text_CAPTCHA
+ */
+abstract class Text_CAPTCHA
 {
-
     /**
-     * Version number
+     * Captcha
      *
-     * @access private
-     * @var string
+     * @var object|string
      */
-    var $_version = '0.4.0';
+    private $_captcha;
 
     /**
      * Phrase
      *
-     * @access private
      * @var string
      */
-    var $_phrase;
+    private $_phrase;
 
     /**
-     * Create a new Text_CAPTCHA object
+     * Create a new Text_CAPTCHA object.
      *
      * @param string $driver name of driver class to initialize
      *
-     * @return mixed a newly created Text_CAPTCHA object, or a PEAR
-     * error object on error
+     * @return Text_CAPTCHA a newly created Text_CAPTCHA object
      *
-     * @see PEAR::isError()
+     * @throws Text_CAPTCHA_Exception when invalid driver is specified
      */
-    function &factory($driver)
+    public static function factory($driver)
     {
         if ($driver == '') {
-            return PEAR::raiseError('No CAPTCHA type specified ... aborting. You must call ::factory() with one parameter, the CAPTCHA type.', true);
+            throw new Text_CAPTCHA_Exception(
+                'No CAPTCHA type specified ... aborting. ' .
+                'You must call ::factory() with one parameter, the CAPTCHA type.'
+            );
         }
         $driver = basename($driver);
         include_once "Text/CAPTCHA/Driver/$driver.php";
 
         $classname = "Text_CAPTCHA_Driver_$driver";
-        $obj =& new $classname;
+        $obj = new $classname;
         return $obj;
     }
 
     /**
      * Create random CAPTCHA phrase
      *
-     * This method creates a random phrase, 8 characters long
+     * @param boolean|string $newPhrase new Phrase to use or true to generate a new
+     *                                  one
      *
-     * @param array $options Optionally supply advanced options for the phrase-creation
-     *
-     * @access private
      * @return void
      */
-    function _createPhrase($options = array())
+    public final function generate($newPhrase = false)
     {
-        $len = 8;
-        if (!is_array($options) || count($options) === 0) {
-            $this->_phrase = Text_Password::create($len);
-        } else {
-            if (count($options) === 1) {
-                $this->_phrase = Text_Password::create($len, $options[0]);
-            } else {
-                $this->_phrase = Text_Password::create($len, $options[0], $options[1]);
-            }
+        if ($newPhrase === true || empty($this->_phrase)) {
+            $this->createPhrase();
+        } else if (strlen($newPhrase) > 0) {
+            $this->setPhrase($newPhrase);
         }
+        $this->createCAPTCHA();
+    }
+
+    /**
+     * Sets secret CAPTCHA phrase.
+     *
+     * This method sets the CAPTCHA phrase (use null for a random phrase)
+     *
+     * @param string $phrase The (new) phrase
+     *
+     * @return void
+     */
+    protected final function setPhrase($phrase)
+    {
+        $this->_phrase = $phrase;
     }
 
     /**
@@ -199,69 +208,62 @@ class Text_CAPTCHA
      *
      * This method returns the CAPTCHA phrase
      *
-     * @access  public
-     * @return  phrase   secret phrase
+     * @return  string   secret phrase
      */
-    function getPhrase()
+    public final function getPhrase()
     {
         return $this->_phrase;
     }
 
     /**
-     * Sets secret CAPTCHA phrase
+     * Sets the generated captcha.
      *
-     * This method sets the CAPTCHA phrase 
-     * (use null for a random phrase)
+     * @param object|string $captcha the generated captcha
      *
-     * @param string $phrase The (new) phrase
-     *
-     * @access public
      * @return void
      */
-    function setPhrase($phrase = null)
+    protected final function setCaptcha($captcha)
     {
-        if (!empty($phrase)) {
-            $this->_phrase = $phrase;
-        } else {
-            $this->_createPhrase();
-        }
+        $this->_captcha = $captcha;
     }
 
     /**
-     * Place holder for the real init() method
-     * used by extended classes to initialize CAPTCHA 
+     * Place holder for the real getCAPTCHA() method
+     * used by extended classes to return the generated CAPTCHA
+     * (as an image resource, as an ASCII text, ...)
      *
-     * @access private
-     * @return PEAR_Error
+     * @return string|object
      */
-    function init()
+    public final function getCAPTCHA()
     {
-        return PEAR::raiseError('CAPTCHA type not selected', true);
+        return $this->_captcha;
+    }
+
+    /**
+     * Place holder for the real init() method used by extended classes to
+     * initialize CAPTCHA.
+     *
+     * @param array $options Options to pass in.
+     *
+     * @return void
+     */
+    public function init($options = array())
+    {
+        $this->generate();
     }
 
     /**
      * Place holder for the real _createCAPTCHA() method
      * used by extended classes to generate CAPTCHA from phrase
      *
-     * @access private
-     * @return PEAR_Error
+     * @return void
      */
-    function _createCAPTCHA()
-    {
-        return PEAR::raiseError('CAPTCHA type not selected', true);
-    }
+    protected abstract function createCAPTCHA();
 
     /**
-     * Place holder for the real getCAPTCHA() method
-     * used by extended classes to return the generated CAPTCHA 
-     * (as an image resource, as an ASCII text, ...)
+     * Create the passphrase.
      *
-     * @access private
-     * @return PEAR_Error
+     * @return void
      */
-    function getCAPTCHA()
-    {
-        return PEAR::raiseError('CAPTCHA type not selected', true);
-    }
+    protected abstract function createPhrase();
 }
-?>
