@@ -164,11 +164,17 @@ abstract class Text_CAPTCHA
             );
         }
         $driver = basename($driver);
-        include_once "Text/CAPTCHA/Driver/$driver.php";
+        $driverFile = __DIR__ . "/CAPTCHA/Driver/$driver.php";
+        if (file_exists($driverFile) && is_readable($driverFile)) {
+            include_once $driverFile;
 
-        $classname = "Text_CAPTCHA_Driver_$driver";
-        $obj = new $classname;
-        return $obj;
+            $classname = "Text_CAPTCHA_Driver_$driver";
+            return new $classname;
+        } else {
+            throw new Text_CAPTCHA_Exception(
+                'Invalid CAPTCHA type specified ... aborting.'
+            );
+        }
     }
 
     /**
