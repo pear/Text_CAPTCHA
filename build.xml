@@ -90,7 +90,7 @@
         </pearPkg2>
     </target>
 
-    <target name="phpCS" description="Run PHPCodeSniffer">
+    <target name="phpCS" description="Find coding standard violations using PHP_CodeSniffer">
         <phpcodesniffer standard="PEAR" format="full" file="."
                         allowedFileExtensions="php php5 inc">
             <fileset defaultexcludes="false" expandsymboliclinks="true" dir=".">
@@ -100,7 +100,7 @@
         </phpcodesniffer>
     </target>
 
-    <target name="package" depends="clean, test, generate_package_xml">
+    <target name="package" depends="clean, test, generate_package_xml" description="Make a full release and build the package file">
         <copy todir="${buildDir}">
             <fileset defaultexcludes="false" expandsymboliclinks="true" dir=".">
                 <include name="tests/**"/>
@@ -113,7 +113,7 @@
 
     <target name="doc" description="Generate the API Documentation">
         <phpdoc2 title="API Documentation" destdir="${apidocs}"
-                 template="responsive">
+                 template="Abstract">
             <fileset dir="./Text">
                 <include name="**/*.php"/>
             </fileset>
