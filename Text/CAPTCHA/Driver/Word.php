@@ -119,15 +119,14 @@ class Text_CAPTCHA_Driver_Word extends Text_CAPTCHA
     {
         $res = '';
         $numberWords = new Numbers_Words();
+        $phrase = $this->getPhrase();
         if ($this->_mode == 'single') {
-            for ($i = 0; $i < strlen($this->getPhrase()); $i++) {
-                $res .= ' ' .
-                    $numberWords->toWords(
-                        $this->getPhrase()[$i], $this->_locale
-                    );
+            $phraseArr = str_split($phrase);
+            for ($i = 0; $i < strlen($phrase); $i++) {
+                $res .= ' ' . $numberWords->toWords($phraseArr[$i], $this->_locale);
             }
         } else {
-            $res = $numberWords->toWords($this->getPhrase(), $this->_locale);
+            $res = $numberWords->toWords($phrase, $this->_locale);
         }
         $this->setCaptcha($res);
     }
