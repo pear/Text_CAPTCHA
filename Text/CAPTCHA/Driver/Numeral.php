@@ -1,50 +1,22 @@
 <?php
-// {{{ Class Text_CAPTCHA_Driver_Numeral
-// +----------------------------------------------------------------------+
-// | PHP version 5                                                       |
-// +----------------------------------------------------------------------+
-// | Copyright (c) 1998-2006 David Coallier                               | 
-// | All rights reserved.                                                 |
-// +----------------------------------------------------------------------+
-// |                                                                      |
-// | Redistribution and use in source and binary forms, with or without   |
-// | modification, are permitted provided that the following conditions   |
-// | are met:                                                             |
-// |                                                                      |
-// | Redistributions of source code must retain the above copyright       |
-// | notice, this list of conditions and the following disclaimer.        |
-// |                                                                      |
-// | Redistributions in binary form must reproduce the above copyright    |
-// | notice, this list of conditions and the following disclaimer in the  |
-// | documentation and/or other materials provided with the distribution. |
-// |                                                                      |
-// | Neither the name of David Coallier nor the names of his contributors |
-// | may be used to endorse                                               |
-// | or promote products derived from this software without specific prior|
-// | written permission.                                                  |
-// |                                                                      |
-// | THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS  |
-// | "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT    |
-// | LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS    |
-// | FOR A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE      |
-// | REGENTS OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,          |
-// | INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, |
-// | BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS|
-// |  OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED  |
-// | AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT          |
-// | LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY|
-// | WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE          |
-// | POSSIBILITY OF SUCH DAMAGE.                                          |
-// +----------------------------------------------------------------------+
-// | Author: David Coallier <davidc@agoraproduction.com>                  |
-// +----------------------------------------------------------------------+
-//
+/**
+ * Class used for numeral captchas
+ *
+ * PHP version 5
+ *
+ * @category Text
+ * @package  Text_CAPTCHA
+ * @author   David Coallier <davidc@agoraproduction.com>
+ * @author   Christian Wenz <wenz@php.net>
+ * @author   Michael Cramer <michael@bigmichi1.de>
+ * @license  BSD License
+ * @link     http://pear.php.net/package/Text_CAPTCHA
+ */
 require_once 'Text/CAPTCHA.php';
 /**
  * Class used for numeral captchas
- * 
- * This class is intended to be used to generate
- * numeral captchas as such as:
+ *
+ * This class is intended to be used to generate numeral captchas as such as:
  * Example:
  *  Give me the answer to "54 + 2" to prove that you are human.
  *
@@ -52,401 +24,224 @@ require_once 'Text/CAPTCHA.php';
  * @package  Text_CAPTCHA
  * @author   David Coallier <davidc@agoraproduction.com>
  * @author   Christian Wenz <wenz@php.net>
+ * @author   Michael Cramer <michael@bigmichi1.de>
+ * @license  BSD License
+ * @link     http://pear.php.net/package/Text_CAPTCHA
  */
 class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
 {
-    // {{{ Variables
     /**
-     * Minimum range value
-     * 
-     * This variable holds the minimum range value 
-     * default set to "1"
-     * 
-     * @access private
-     * @var    integer $_minValue The minimum range value
+     * This variable holds the minimum range value default set to "1".
+     *
+     * @var integer $_minValue The minimum value of the number range.
      */
-    var $_minValue = 1;
-    
+    private $_minValue = 1;
+
     /**
-     * Maximum range value
-     * 
-     * This variable holds the maximum range value
-     * default set to "50"
-     * 
-     * @access private
-     * @var    integer $_maxValue The maximum value of the number range
+     * This variable holds the maximum range value default set to "50".
+     *
+     * @var integer $_maxValue The maximum value of the number range.
      */
-    var $_maxValue = 50;
-    
+    private $_maxValue = 50;
+
     /**
-     * Operators
-     * 
-     * The valid operators to use
-     * in the numeral captcha. We could
-     * use / and * but not yet.
-     * 
-     * @access private
-     * @var    array $_operators The operations for the captcha
+     * The valid operators to use in the numeral captcha. We could use / and * but
+     * not yet.
+     *
+     * @var array $_operators The operations for the captcha.
      */
-    var $_operators = array('-', '+');
-    
+    private $_operators = array('-', '+');
+
     /**
-     * Operator to use
-     * 
-     * This variable is basically the operation
-     * that we're going to be using in the 
+     * This variable is basically the operation that we're going to be using in the
      * numeral captcha we are about to generate.
      *
-     * @access private
-     * @var    string $_operator The operation's operator
+     * @var string $_operator The operation's operator to use.
      */
-    var $_operator = '';
-    
+    private $_operator = '';
+
     /**
-     * Mathematical Operation
-     * 
-     * This is the mathematical operation
-     * that we are displaying to the user.
+     * This variable holds the first number of the numeral operation we are about to
+     * generate.
      *
-     * @access private
-     * @var    string $_operation The math operation
+     * @var integer $_firstNumber The first number of the operation.
      */
-    var $_operation = '';
-    
+    private $_firstNumber = 0;
+
     /**
-     * First number of the operation
-     *
-     * This variable holds the first number
-     * of the numeral operation we are about
-     * to generate. 
-     * 
-     * @access private
-     * @var    integer $_firstNumber The first number of the operation
-     */
-    var $_firstNumber = '';
-    
-    /**
-     * Second Number of the operation
-     * 
-     * This variable holds the value of the
-     * second variable of the operation we are
+     * This variable holds the value of the second variable of the operation we are
      * about to generate for the captcha.
-     * 
-     * @access private
-     * @var    integer $_secondNumber The second number of the operation      
-     */ 
-    var $_secondNumber = '';
-    // }}}
-    // {{{ Constructor
-    function init($options = array())
+     *
+     * @var integer $_secondNumber The second number of the operation.
+     */
+    private $_secondNumber = 0;
+
+    /**
+     * Initialize numeric CAPTCHA.
+     *
+     * @param array $options CAPTCHA options with these keys:<br>
+     *                       minValue minimum value<br>
+     *                       maxValue maximum value
+     *
+     * @return void
+     */
+    public function init($options = array())
     {
         if (isset($options['minValue'])) {
             $this->_minValue = (int)$options['minValue'];
+        } else {
+            $this->_minValue = 1;
         }
         if (isset($options['maxValue'])) {
             $this->_maxValue = (int)$options['maxValue'];
+        } else {
+            $this->_maxValue = 50;
         }
-        
-        $this->_createCAPTCHA();
+        parent::init($options);
     }
-    // }}}
-    // {{{ private function _createCAPTCHA
+
     /**
-     * Create the CAPTCHA (the numeral expressio)
-     * 
-     * This function determines a random numeral expression
-     * and set the associated class properties
+     * Create the CAPTCHA (the numeral expression).
      *
-     * @access private
+     * This function determines a random numeral expression and set the associated
+     * class properties.
+     *
      * @return void
+     * @see _generateFirstNumber()
+     * @see _generateSecondNumber()
+     * @see _generateOperator()
+     * @see _generateOperation()
      */
-    function _createCAPTCHA()
-    { 
-        $this->_generateFirstNumber();
-        $this->_generateSecondNumber();
-        $this->_generateOperator();
+    protected function createCAPTCHA()
+    {
+        $this->_firstNumber = $this->_generateNumber();
+        $this->_secondNumber = $this->_generateNumber();
+        $this->_operator = $this->_operators[array_rand($this->_operators)];
         $this->_generateOperation();
     }
-    // }}}
-    // {{{ private function _setRangeMinimum
+
     /**
-     * Set Range Minimum value
-     * 
-     * This function give the developer the ability
-     * to set the range minimum value so the operations
-     * can be bigger, smaller, etc.
+     * Set operation.
      *
-     * @param integer $minValue The minimum value
+     * This variable sets the operation variable by taking the firstNumber,
+     * secondNumber and operator.
      *
-     * @access private
      * @return void
+     * @see _operation
+     * @see _firstNumber
+     * @see _operator
+     * @see _secondNumber
      */
-    function _setRangeMinimum($minValue = 1) 
+    private function _setOperation()
     {
-        $this->minValue = (int)$minValue;
+        $this->setCaptcha(
+            $this->_firstNumber . ' ' . $this->_operator . ' ' . $this->_secondNumber
+        );
     }
-    // }}}
-    // {{{ private function _generateFirstNumber
+
     /**
-     * Sets the first number
-     * 
-     * This function sets the first number 
-     * of the operation by calling the _generateNumber
-     * function that generates a random number.
-     * 
-     * @access private
-     * @return void
-     * @see    $this->_firstNumber, $this->_generateNumber
-     */
-    function _generateFirstNumber()
-    {
-        $this->_setFirstNumber($this->_generateNumber());
-    }
-    // }}}
-    // {{{ private function generateSecondNumber
-    /**
-     * Sets second number
-     * 
-     * This function sets the second number of the
-     * operation by calling _generateNumber()
-     * 
-     * @access private
-     * @return void
-     * @see    $this->_secondNumber, $this->_generateNumber()
-     */
-    function _generateSecondNumber()
-    {
-        $this->_setSecondNumber($this->_generateNumber());
-    }
-    // }}}
-    // {{{ private function generateOperator
-    /**
-     * Sets the operation operator
-     * 
-     * This function sets the operation operator by
-     * getting the array value of an array_rand() of
-     * the $this->_operators() array.
+     * Generate a number.
      *
-     * @access private
-     * @return void
-     * @see    $this->_operators, $this->_operator
-     */
-    function _generateOperator()
-    {
-        $this->_operator = $this->_operators[array_rand($this->_operators)];
-    }
-    // }}}
-    // {{{ private function setAnswer
-    /**
-     * Sets the answer value
-     * 
-     * This function will accept the parameters which is
-     * basically the result of the function we have done 
-     * and it will set $this->answer with it.
-     * 
-     * @param integer $phraseValue The answer value
-     * 
-     * @access private
-     * @return void
-     * @see    $this->_phrase
-     */
-    function _setPhrase($phraseValue)
-    {   
-        $this->_phrase = $phraseValue;
-    }
-    // }}}
-    // {{{ private function setFirstNumber
-    /**
-     * Set First number
+     * This function takes the parameters that are in the $this->_maxValue and
+     * $this->_minValue and get the random number from them using mt_rand().
      *
-     * This function sets the first number
-     * to the value passed to the function
-     *
-     * @param integer $value The first number value.
-     *
-     * @access private
-     * @return void
-     */
-    function _setFirstNumber($value) 
-    {
-        $this->_firstNumber = (int)$value;
-    }
-    // }}}
-    // {{{ private function setSecondNumber
-    /**
-     * Sets the second number
-     * 
-     * This function sets the second number
-     * with the value passed to it.
-     *
-     * @param integer $value The second number new value.
-     *
-     * @access private
-     * @return void
-     */
-    function _setSecondNumber($value)
-    {
-        $this->_secondNumber = (int)$value;
-    }
-    // }}}
-    // {{{ private function setOperation
-    /**
-     * Set operation
-     * 
-     * This variable sets the operation variable
-     * by taking the firstNumber, secondNumber and operator
-     *
-     * @access private
-     * @return void
-     * @see    $this->_operation
-     */
-    function _setOperation()
-    {
-        $this->_operation = $this->_getFirstNumber() . ' ' .
-                            $this->_operator . ' ' .
-                            $this->_getSecondNumber();
-    }
-    // }}}
-    // {{{ private function _generateNumber
-    /**
-     * Generate a number
-     * 
-     * This function takes the parameters that are in 
-     * the $this->_maxValue and $this->_minValue and get
-     * the random number from them using mt_rand()
-     *
-     * @access private
      * @return integer Random value between _minValue and _maxValue
+     * @see _minValue
+     * @see _maxValue
      */
-    function _generateNumber()
+    private function _generateNumber()
     {
         return mt_rand($this->_minValue, $this->_maxValue);
     }
-    // }}}
-    // {{{ private function _doAdd
+
     /**
-     * Adds values
-     * 
-     * This function will add the firstNumber and the
-     * secondNumber value and then call setAnswer to
-     * set the answer value.
-     * 
-     * @access private
+     * Adds values.
+     *
+     * This function will add the firstNumber and the secondNumber value and then
+     * call setAnswer to set the answer value.
+     *
      * @return void
-     * @see    $this->_firstNumber, $this->_secondNumber, $this->_setAnswer()
+     * @see _firstNumber
+     * @see _secondNumber
+     * @see _setAnswer()
      */
-    function _doAdd()
+    private function _doAdd()
     {
-        $phrase = $this->_getFirstNumber() + $this->_getSecondNumber();
-        $this->_setPhrase($phrase);
+        $phrase = $this->_firstNumber + $this->_secondNumber;
+        $this->setPhrase($phrase);
     }
-    // }}}
-    // {{{ private function _doSubstract
+
     /**
-     * Does a substract on the values
-     * 
-     * This function executes a substraction on the firstNumber
-     * and the secondNumber to then call $this->setAnswer to set
-     * the answer value. 
-     * 
-     * If the firstnumber value is smaller than the secondnumber value
-     * then we regenerate the first number and regenerate the operation.
-     * 
-     * @access private
+     * Does a subtract on the values.
+     *
+     * This function executes a subtraction on the firstNumber and the secondNumber
+     * to then call $this->setAnswer to set the answer value.
+     *
+     * If the _firstNumber value is smaller than the _secondNumber value then we
+     * regenerate the first number and regenerate the operation.
+     *
      * @return void
-     * @see    $this->_firstNumber, $this->_secondNumber, $this->_setAnswer()
+     * @see _firstNumber
+     * @see _secondNumber
+     * @see _setOperation()
+     * @see Text_CAPTCHA::setPhrase()
      */
-    function _doSubstract()
+    private function _doSubtract()
     {
-        $first  = $this->_getFirstNumber();
-        $second = $this->_getSecondNumber();
+        $first = $this->_firstNumber;
+        $second = $this->_secondNumber;
 
         /**
          * Check if firstNumber is smaller than secondNumber
          */
         if ($first < $second) {
-            $this->_setFirstNumber($second);
-            $this->_setSecondNumber($first);
+            $this->_firstNumber = $second;
+            $this->_secondNumber = $first;
             $this->_setOperation();
         }
 
-        $phrase = $this->_getFirstNumber() - $this->_getSecondNumber();
-        $this->_setPhrase($phrase);
+        $phrase = $this->_firstNumber - $this->_secondNumber;
+        $this->setPhrase($phrase);
     }
-    // }}}
-    // {{{ private function _generateOperation
+
     /**
      * Generate the operation
-     * 
-     * This function will call the _setOperation() function
-     * to set the operation string that will be called
-     * to display the operation, and call the function necessary
-     * depending on which operation is set by this->operator.
-     * 
-     * @access private
+     *
+     * This function will call the _setOperation() function to set the operation
+     * string that will be called to display the operation, and call the function
+     * necessary depending on which operation is set by this->operator.
+     *
      * @return void
-     * @see    $this->_setOperation(), $this->_operator
+     * @see _setOperation()
+     * @see _operator
+     * @see _doAdd()
+     * @see _doSubtract()
      */
-    function _generateOperation()
+    private function _generateOperation()
     {
         $this->_setOperation();
-                           
         switch ($this->_operator) {
         case '+':
             $this->_doAdd();
             break;
         case '-':
-            $this->_doSubstract();
+            $this->_doSubtract();
             break;
         default:
+            $this->_operator = "+";
+            $this->_setOperation();
             $this->_doAdd();
             break;
         }
     }
-    // }}}
-    // {{{ public function _getFirstNumber
+
     /**
-     * Get the first number
-     * 
-     * This function will get the first number
-     * value from $this->_firstNumber
-     * 
-     * @access public
-     * @return integer $this->_firstNumber The firstNumber
-     */
-    function _getFirstNumber()
-    {
-        return $this->_firstNumber;
-    }
-    // }}}
-    // {{{ public function _getSecondNumber
-    /**
-     * Get the second number value
-     * 
-     * This function will return the second number value
-     * 
-     * @access public
-     * @return integer $this->_secondNumber The second number
-     */
-    function _getSecondNumber()
-    {
-        return $this->_secondNumber;
-    }
-    // }}}
-    // {{{ public function getCAPTCHA
-    /**
-     * Get operation
-     * 
-     * This function will get the operation
-     * string from $this->_operation
+     * Create random CAPTCHA phrase. This method is a placeholder, since the equation
+     * is created in createCAPTCHA()
      *
-     * @access public
-     * @return string The operation String
+     * @return string
      */
-    function getCAPTCHA()
+    protected function createPhrase()
     {
-        return $this->_operation;
     }
 }
-// }}}
-?>

@@ -1,6 +1,15 @@
 <?php
 /**
  * Require Image_Text class for generating the text.
+ *
+ * PHP version 5
+ *
+ * @category Text
+ * @package  Text_CAPTCHA
+ * @author   Christian Wenz <wenz@php.net>
+ * @author   Michael Cramer <michael@bigmichi1.de>
+ * @license  BSD License
+ * @link     http://pear.php.net/package/Text_CAPTCHA
  */
 require_once 'Text/CAPTCHA.php';
 require_once 'Image/Text.php';
@@ -8,199 +17,126 @@ require_once 'Image/Text.php';
 /**
  * Text_CAPTCHA_Driver_Image - Text_CAPTCHA driver graphical CAPTCHAs
  *
- * Class to create a graphical Turing test 
- * 
- * @author  Christian Wenz <wenz@php.net>
- * @license BSD License
- * @todo refine the obfuscation algorithm :-)
- * @todo consider removing Image_Text dependency
+ * Class to create a graphical Turing test
+ *
+ * @category Text
+ * @package  Text_CAPTCHA
+ * @author   Christian Wenz <wenz@php.net>
+ * @author   Michael Cramer <michael@bigmichi1.de>
+ * @license  BSD License
+ * @link     http://pear.php.net/package/Text_CAPTCHA
+ * @todo     refine the obfuscation algorithm :-)
+ * @todo     consider removing Image_Text dependency
  */
-
 class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA
 {
-
     /**
-     * Image object
+     * Text_Password options.
      *
-     * @access private
-     * @var resource
+     * @var array
      */
-    var $_im;
-
-    /**
-     * Image_Text object
-     *
-     * @access private
-     * @var resource
-     */
-    var $_imt;
-
+    private $_textPasswordOptions;
     /**
      * Width of CAPTCHA
      *
-     * @access private
      * @var int
      */
-    var $_width;
+    private $_width;
 
     /**
      * Height of CAPTCHA
      *
-     * @access private
      * @var int
      */
-    var $_height;
+    private $_height;
 
     /**
      * CAPTCHA output format
      *
-     * @access private
      * @var string
      */
-    var $_output;
+    private $_output;
 
     /**
      * Further options (here: for Image_Text)
      *
-     * @access private
      * @var array
      */
-    var $_imageOptions = array(
-        'font_size'        => 24,
-        'font_path'        => './',
-        'font_file'        => 'COUR.TTF',
-        'text_color'       => '#000000',
-        'lines_color'      => '#CACACA',
+    private $_imageOptions = array(
+        'font_size' => 24,
+        'font_path' => './',
+        'font_file' => 'COUR.TTF',
+        'text_color' => '#000000',
+        'lines_color' => '#CACACA',
         'background_color' => '#555555',
-        'antialias'        => false);
-        
-    /**
-     * Whether the immage resource has been created
-     *
-     * @access private
-     * @var boolean
-     */
-    var $_created = false;
+        'antialias' => false);
 
     /**
-     * Last error
-     *
-     * @access protected
-     * @var PEAR_Error
-     */
-    var $_error = null;
-
-    /**
-     * init function
+     * Init function
      *
      * Initializes the new Text_CAPTCHA_Driver_Image object and creates a GD image
      *
      * @param array $options CAPTCHA options
      *
-     * @access public
-     * @return mixed  true upon success, PEAR error otherwise
+     * @return void
      */
-    function init($options = array())
+    public function init($options = array())
     {
-        if (!is_array($options)) {
-            // Compatibility mode ... in future versions, these two
-            // lines of code will be used: 
-            // $this->_error = PEAR::raiseError('You need to provide a set of CAPTCHA options!');
-            // return $this->_error;                  
-            $o = array();
-            $args = func_get_args();
-            if (isset($args[0])) {
-                $o['width'] = $args[0];
-            }    
-            if (isset($args[1])) {
-                $o['height'] = $args[1];
-            }    
-            if (isset($args[2]) && $args[2] != null) {
-                $o['phrase'] = $args[2];
-            }
-            if (isset($args[3]) && is_array($args[3])) {
-                $o['imageOptions'] = $args[3];
-            }
-            $options = $o;
-        }
-        if (is_array($options)) { 
+        if (is_array($options)) {
             if (isset($options['width']) && is_int($options['width'])) {
                 $this->_width = $options['width'];
             } else {
-                $this->_width = 200; 
+                $this->_width = 200;
             }
             if (isset($options['height']) && is_int($options['height'])) {
                 $this->_height = $options['height'];
             } else {
-                $this->_height = 80; 
+                $this->_height = 80;
             }
             if (!isset($options['phrase']) || empty($options['phrase'])) {
-                $phraseoptions = (isset($options['phraseOptions']) && is_array($options['phraseOptions'])) ? $options['phraseOptions'] : array();
-                $this->_createPhrase($phraseoptions);
+                $phraseOptions = (isset($options['phraseOptions'])
+                    && is_array($options['phraseOptions']))
+                    ? $options['phraseOptions'] : array();
+                $this->_textPasswordOptions = $phraseOptions;
             } else {
-                $this->_phrase = $options['phrase'];
+                $this->setPhrase($options['phrase']);
             }
             if (!isset($options['output']) || empty($options['output'])) {
                 $this->_output = 'resource';
             } else {
                 $this->_output = $options['output'];
-            } 
-            if (isset($options['imageOptions']) && is_array($options['imageOptions']) && count($options['imageOptions']) > 0) {
-                $this->_imageOptions = array_merge($this->_imageOptions, $options['imageOptions']); 
             }
-            return true;
+            if (isset($options['imageOptions'])
+                && is_array($options['imageOptions'])
+                && count($options['imageOptions']) > 0
+            ) {
+                $this->_imageOptions = array_merge(
+                    $this->_imageOptions, $options['imageOptions']
+                );
+            }
+            parent::init($options);
         }
     }
 
     /**
-     * Create random CAPTCHA phrase, Image edition (with size check)
+     * Create CAPTCHA image.
      *
-     * This method creates a random phrase, maximum 8 characters or width / 25, whatever is smaller
+     * This method creates a CAPTCHA image.
      *
-     * @param array $options Optionally supply advanced options for the phrase-creation
-     *
-     * @access private
      * @return void
+     * @throws Text_CAPTCHA_Exception when image generation with Image_Text produces
+     *               an error
      */
-    function _createPhrase($options = array())
+    protected function createCAPTCHA()
     {
-        $len = intval(min(8, $this->_width / 25));
-        if (!is_array($options) || count($options) === 0) {
-            $this->_phrase = Text_Password::create($len);
-        } else {
-            if (count($options) === 1) {
-                $this->_phrase = Text_Password::create($len, $options[0]);
-            } else {
-                $this->_phrase = Text_Password::create($len, $options[0], $options[1]);
-            }
-        }
-        $this->_created = false;
-    }
-
-    /**
-     * Create CAPTCHA image
-     *
-     * This method creates a CAPTCHA image
-     *
-     * @access  private
-     * @return  void   PEAR_Error on error
-     */
-    function _createCAPTCHA()
-    {
-        if ($this->_error) {
-            return $this->_error;
-        }
-        if ($this->_created) {
-            return;
-        }
         $options['canvas'] = array(
             'width' => $this->_width,
             'height' => $this->_height
-        ); 
+        );
         $options['width'] = $this->_width - 20;
-        $options['height'] = $this->_height - 20; 
+        $options['height'] = $this->_height - 20;
         $options['cx'] = ceil(($this->_width) / 2 + 10);
-        $options['cy'] = ceil(($this->_height) / 2 + 10); 
+        $options['cy'] = ceil(($this->_height) / 2 + 10);
         $options['angle'] = rand(0, 30) - 15;
         $options['font_size'] = $this->_imageOptions['font_size'];
         $options['font_path'] = $this->_imageOptions['font_path'];
@@ -210,176 +146,165 @@ class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA
         $options['max_lines'] = 1;
         $options['mode'] = 'auto';
         do {
-            $this->_imt = new Image_Text( 
-                $this->_phrase,
-                $options
-            );
-            if (PEAR::isError($e = $this->_imt->init())) {
-                $this->_error = PEAR::raiseError(
-                    sprintf('Error initializing Image_Text (%s)', $e->getMessage())
-                );
-                return $this->_error;
-            } else {
-                $this->_created = true; 
-            }
-            $result = $this->_imt->measurize();
+            $imageText = new Image_Text($this->getPhrase(), $options);
+            $imageText->init();
+            $result = $imageText->measurize();
         } while ($result === false && --$options['font_size'] > 0);
         if ($result === false) {
-            $this->_error = PEAR::raiseError('The text provided does not fit in the image dimensions');
-            return $this->_error;
+            throw new Text_CAPTCHA_Exception(
+                'The text provided does not fit in the image dimensions'
+            );
         }
-        $this->_imt->render();
-        $this->_im =& $this->_imt->getImg(); 
+        $imageText->render();
+        $image = $imageText->getImg();
 
         if ($this->_imageOptions['antialias'] && function_exists('imageantialias')) {
-            imageantialias($this->_im, true);
+            imageantialias($image, true);
         }
 
-        $colors = $this->_imt->_convertString2RGB($this->_imageOptions['lines_color']);
-        $lines_color = imagecolorallocate($this->_im, $colors['r'], $colors['g'], $colors['b']);
+        $colors = $imageText->_convertString2RGB(
+            $this->_imageOptions['lines_color']
+        );
+        $linesColor = imagecolorallocate(
+            $image, $colors['r'], $colors['g'], $colors['b']
+        );
         //some obfuscation
         for ($i = 0; $i < 3; $i++) {
             $x1 = rand(0, $this->_width - 1);
             $y1 = rand(0, round($this->_height / 10, 0));
             $x2 = rand(0, round($this->_width / 10, 0));
             $y2 = rand(0, $this->_height - 1);
-            imageline($this->_im, $x1, $y1, $x2, $y2, $lines_color);
+            imageline($image, $x1, $y1, $x2, $y2, $linesColor);
             $x1 = rand(0, $this->_width - 1);
             $y1 = $this->_height - rand(1, round($this->_height / 10, 0));
             $x2 = $this->_width - rand(1, round($this->_width / 10, 0));
             $y2 = rand(0, $this->_height - 1);
-            imageline($this->_im, $x1, $y1, $x2, $y2, $lines_color);
+            imageline($image, $x1, $y1, $x2, $y2, $linesColor);
             $cx = rand(0, $this->_width - 50) + 25;
             $cy = rand(0, $this->_height - 50) + 25;
             $w = rand(1, 24);
-            imagearc($this->_im, $cx, $cy, $w, $w, 0, 360, $lines_color);
+            imagearc($image, $cx, $cy, $w, $w, 0, 360, $linesColor);
         }
-    }
 
-    /**
-     * Return CAPTCHA as image resource
-     *
-     * This method returns the CAPTCHA depending on the output format
-     *
-     * @access  public
-     * @return  mixed        image resource or PEAR error
-     */
-    function getCAPTCHA()
-    {
-        $retval = $this->_createCAPTCHA();
-        if (PEAR::isError($retval)) {
-            return PEAR::raiseError($retval->getMessage());
-        }
-        
         if ($this->_output == 'gif' && !function_exists('imagegif')) {
             $this->_output = 'png';
         }
 
         switch ($this->_output) {
         case 'png':
-            return $this->getCAPTCHAAsPNG();
+            $this->setCaptcha($this->_getCAPTCHAAsPNG($image));
             break;
-        case 'jpg': 
+        case 'jpg':
         case 'jpeg':
-            return $this->getCAPTCHAAsJPEG();
+            $this->setCaptcha($this->_getCAPTCHAAsJPEG($image));
             break;
         case 'gif':
-            return $this->getCAPTCHAAsGIF();
+            $this->setCaptcha($this->_getCAPTCHAAsGIF($image));
             break;
         case 'resource':
         default:
-            return $this->_im;
+            $this->setCaptcha($image);
         }
     }
 
     /**
-     * Return CAPTCHA as PNG
+     * Return CAPTCHA as PNG.
      *
-     * This method returns the CAPTCHA as PNG
+     * This method returns the CAPTCHA as PNG.
      *
-     * @access  public
-     * @return  mixed        image contents or PEAR error
+     * @param resource $image generated image
+     *
+     * @return string image contents
+     * @throws Text_CAPTCHA_Exception when image is not a valid resource
      */
-    function getCAPTCHAAsPNG()
+    private function _getCAPTCHAAsPNG($image)
     {
-        $retval = $this->_createCAPTCHA();
-        if (PEAR::isError($retval)) {
-            return PEAR::raiseError($retval->getMessage());
-        }
-
-        if (is_resource($this->_im)) {
+        if (is_resource($image)) {
             ob_start();
-            imagepng($this->_im);
+            imagepng($image);
             $data = ob_get_contents();
             ob_end_clean();
             return $data;
         } else {
-            $this->_error = PEAR::raiseError('Error creating CAPTCHA image (font missing?!)');
-            return $this->_error;
+            throw new Text_CAPTCHA_Exception(
+                'Error creating CAPTCHA image'
+            );
         }
     }
 
     /**
-     * Return CAPTCHA as JPEG
+     * Return CAPTCHA as JPEG.
      *
-     * This method returns the CAPTCHA as JPEG
+     * This method returns the CAPTCHA as JPEG.
      *
-     * @access  public
-     * @return  mixed        image contents or PEAR error
+     * @param resource $image generated image
+     *
+     * @return string image contents
+     * @throws Text_CAPTCHA_Exception when image is not a valid resource
      */
-    function getCAPTCHAAsJPEG()
+    private function _getCAPTCHAAsJPEG($image)
     {
-        $retval = $this->_createCAPTCHA();
-        if (PEAR::isError($retval)) {
-            return PEAR::raiseError($retval->getMessage());
-        }
-
-        if (is_resource($this->_im)) {
+        if (is_resource($image)) {
             ob_start();
-            imagejpeg($this->_im);
+            imagejpeg($image);
             $data = ob_get_contents();
             ob_end_clean();
             return $data;
         } else {
-            $this->_error = PEAR::raiseError('Error creating CAPTCHA image (font missing?!)');
-            return $this->_error;
+            throw new Text_CAPTCHA_Exception(
+                'Error creating CAPTCHA image'
+            );
         }
     }
 
     /**
-     * Return CAPTCHA as GIF
+     * Return CAPTCHA as GIF.
      *
-     * This method returns the CAPTCHA as GIF
+     * This method returns the CAPTCHA as GIF.
      *
-     * @access  public
-     * @return  mixed        image contents or PEAR error
+     * @param resource $image generated image
+     *
+     * @return string image contents
+     * @throws Text_CAPTCHA_Exception when image is not a valid resource
      */
-    function getCAPTCHAAsGIF()
+    private function _getCAPTCHAAsGIF($image)
     {
-        $retval = $this->_createCAPTCHA();
-        if (PEAR::isError($retval)) {
-            return PEAR::raiseError($retval->getMessage());
-        }
-
-        if (is_resource($this->_im)) {
+        if (is_resource($image)) {
             ob_start();
-            imagegif($this->_im);
+            imagegif($image);
             $data = ob_get_contents();
             ob_end_clean();
             return $data;
         } else {
-            $this->_error = PEAR::raiseError('Error creating CAPTCHA image (font missing?!)');
-            return $this->_error;
+            throw new Text_CAPTCHA_Exception(
+                'Error creating CAPTCHA image'
+            );
         }
     }
 
     /**
-     * __wakeup method (PHP 5 only)
+     * Create random CAPTCHA phrase, Image edition (with size check).
+     *
+     * This method creates a random phrase, maximum 8 characters or width / 25,
+     * whatever is smaller.
      *
      * @return void
      */
-    function __wakeup()
+    protected function createPhrase()
     {
-        $this->_created = false;
-    } 
+        $len = intval(min(8, $this->_width / 25));
+        $options = $this->_textPasswordOptions;
+        $textPassword = new Text_Password();
+        if (!is_array($options) || count($options) === 0) {
+            $this->setPhrase($textPassword->create($len));
+        } else {
+            if (count($options) === 1) {
+                $this->setPhrase($textPassword->create($len, $options[0]));
+            } else {
+                $this->setPhrase(
+                    $textPassword->create($len, $options[0], $options[1])
+                );
+            }
+        }
+    }
 }
