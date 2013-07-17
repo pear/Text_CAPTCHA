@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="Text_CAPTCHA" default="package" basedir=".">
+    <property name="buildDir" value="${project.basedir}/build"/>
+    <property name="pkgDir" value="${project.basedir}/pkg"/>
+    <property name="apidocs" value="${project.basedir}/apidocs"/>
+
+    <target name="clean" description="Clean up and create artifact directories">
+        <delete dir="${buildDir}"/>
+        <delete dir="${pkgDir}"/>
+        <delete dir="${apidocs}"/>
+
+        <mkdir dir="${buildDir}"/>
+        <mkdir dir="${pkgDir}"/>
+        <mkdir dir="${apidocs}"/>
+    </target>
+
+    <target name="test" description="run all Unit-Tests">
+        <phpunit haltonfailure="true" printsummary="true">
+            <batchtest>
+                <fileset dir="./tests/">
+                    <include name="*Test.php"/>
+                </fileset>
+            </batchtest>
+        </phpunit>
+    </target>
+
+    <target name="generate_package_xml" hidden="true">
+        <pearPkg2 name="Text_CAPTCHA" dir=".">
+            <option name="outputdirectory" value="${buildDir}"/>
+            <option name="packagefile" value="package2.xml"/>
+            <option name="baseinstalldir" value="/"/>
+            <option name="channel" value="pear.php.net"/>
+            <option name="summary" value="Generation of CAPTCHAs"/>
+            <option name="description"
+                    value="Implementation of CAPTCHAs (completely automated public Turing test to tell computers and humans apart)"/>
+            <option name="releaseversion" value="0.5.0"/>
+            <option name="releasestability" value="beta"/>
+            <option name="apiversion" value="0.5.0"/>
+            <option name="apistability" value="beta"/>
+            <option name="license" value="BSD License"/>
+            <option name="notes" value="PHP5 release"/>
+            <option name="phpdep" value="5.0.0"/>
+            <option name="packagetype" value="php"/>
+            <option name="pearinstallerdep" value="1.4.6"/>
+            <mapping name="maintainers">
+                <element>
+                    <element key="handle" value="wenz"/>
+                    <element key="name" value="Christian Wenz"/>
+                    <element key="email" value="wenz@php.net"/>
+                    <element key="role" value="lead"/>
+                </element>
+            </mapping>
+            <mapping name="deps">
+                <element>
+                    <element key="name" value="Text_Password"/>
+                    <element key="version" value="1.1.1"/>
+                    <element key="channel" value="pear.php.net"/>
+                </element>
+                <element>
+                    <element key="name" value="Numbers_Words"/>
+                    <element key="channel" value="pear.php.net"/>
+                    <element key="optional" value="true"/>
+                </element>
+                <element>
+                    <element key="name" value="Text_Figlet"/>
+                    <element key="channel" value="pear.php.net"/>
+                    <element key="optional" value="true"/>
+                </element>
+                <element>
+                    <element key="name" value="Image_Text"/>
+                    <element key="channel" value="pear.php.net"/>
+                    <element key="version" value="0.6.1"/>
+                    <element key="optional" value="true"/>
+                </element>
+            </mapping>
+            <mapping name="extdeps">
+                <element>
+                    <element key="name" value="gd"/>
+                    <element key="optional" value="true"/>
+                </element>
+            </mapping>
+            <fileset dir=".">
+                <exclude name=".idea/**"/>
+                <exclude name="build/*"/>
+                <exclude name="${apidocs}"/>
+                <exclude name="${pkgDir}"/>
+                <exclude name="build.xml"/>
+            </fileset>
+        </pearPkg2>
+    </target>
+
+    <target name="phpCS" description="Find coding standard violations using PHP_CodeSniffer">
+        <phpcodesniffer standard="PEAR" format="full" file="."
+                        allowedFileExtensions="php php5 inc">
+            <fileset defaultexcludes="false" expandsymboliclinks="true" dir=".">
+                <include name="tests/**"/>
+                <include name="Text/**"/>
+            </fileset>
+        </phpcodesniffer>
+    </target>
+
+    <target name="package" depends="clean, test, generate_package_xml" description="Make a full release and build the package file">
+        <copy todir="${buildDir}">
+            <fileset defaultexcludes="false" expandsymboliclinks="true" dir=".">
+                <include name="tests/**"/>
+                <include name="Text/**"/>
+            </fileset>
+        </copy>
+        <tar destfile="${project.basedir}/pkg/Text_CAPTCHA.tar.gz" compression="gzip"
+             basedir="${buildDir}"/>
+    </target>
+
+    <target name="doc" description="Generate the API Documentation">
+        <phpdoc2 title="API Documentation" destdir="${apidocs}"
+                 template="Abstract">
+            <fileset dir="./Text">
+                <include name="**/*.php"/>
+            </fileset>
+        </phpdoc2>
+    </target>
+</project>
