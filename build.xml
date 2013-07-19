@@ -1,22 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <project name="Text_CAPTCHA" default="package" basedir=".">
+    <property name="releaseVer" value="0.5.0"/>
+    <property name="apiVer" value="0.5.0"/>
     <property name="buildDir" value="${project.basedir}/build"/>
+    <property name="reportDir" value="${project.basedir}/report"/>
     <property name="pkgDir" value="${project.basedir}/pkg"/>
-    <property name="apidocs" value="${project.basedir}/apidocs"/>
+    <property name="apiDocsDir" value="${project.basedir}/apidocs"/>
 
     <target name="clean" description="Clean up and create artifact directories">
         <delete dir="${buildDir}"/>
         <delete dir="${pkgDir}"/>
-        <delete dir="${apidocs}"/>
+        <delete dir="${reportDir}"/>
+        <delete dir="${apiDocsDir}"/>
 
         <mkdir dir="${buildDir}"/>
         <mkdir dir="${pkgDir}"/>
-        <mkdir dir="${apidocs}"/>
+        <mkdir dir="${reportDir}"/>
+        <mkdir dir="${apiDocsDir}"/>
     </target>
 
     <target name="test" description="run all Unit-Tests">
-        <phpunit haltonfailure="true" printsummary="true">
+        <coverage-setup database="${reportDir}/coverage.db">
+            <fileset dir="./Text">
+                <include name="**/*.php"/>
+            </fileset>
+        </coverage-setup>
+        <phpunit haltonfailure="true" haltonerror="true" printsummary="true" codecoverage="true">
             <batchtest>
                 <fileset dir="./tests/">
                     <include name="*Test.php"/>
@@ -34,9 +44,9 @@
             <option name="summary" value="Generation of CAPTCHAs"/>
             <option name="description"
                     value="Implementation of CAPTCHAs (completely automated public Turing test to tell computers and humans apart)"/>
-            <option name="releaseversion" value="0.5.0"/>
+            <option name="releaseversion" value="${releaseVer}"/>
             <option name="releasestability" value="beta"/>
-            <option name="apiversion" value="0.5.0"/>
+            <option name="apiversion" value="${apiVer}"/>
             <option name="apistability" value="beta"/>
             <option name="license" value="BSD License"/>
             <option name="notes" value="PHP5 release"/>
@@ -82,10 +92,12 @@
             </mapping>
             <fileset dir=".">
                 <exclude name=".idea/**"/>
-                <exclude name="build/*"/>
-                <exclude name="${apidocs}"/>
+                <exclude name="${buildDir}"/>
+                <exclude name="${apiDocsDir}"/>
                 <exclude name="${pkgDir}"/>
+                <exclude name="${reportDir}"/>
                 <exclude name="build.xml"/>
+                <exclude name="package.xml"/>
             </fileset>
         </pearPkg2>
     </target>
@@ -107,12 +119,12 @@
                 <include name="Text/**"/>
             </fileset>
         </copy>
-        <tar destfile="${project.basedir}/pkg/Text_CAPTCHA.tar.gz" compression="gzip"
+        <tar destfile="${project.basedir}/pkg/Text_CAPTCHA-${releaseVer}.tar.gz" compression="gzip"
              basedir="${buildDir}"/>
     </target>
 
     <target name="doc" description="Generate the API Documentation">
-        <phpdoc2 title="API Documentation" destdir="${apidocs}"
+        <phpdoc2 title="API Documentation" destdir="${apiDocsDir}"
                  template="Abstract">
             <fileset dir="./Text">
                 <include name="**/*.php"/>
