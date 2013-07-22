@@ -35,7 +35,17 @@
         </phpunit>
     </target>
 
-    <target name="generate_package_xml" hidden="true">
+    <target name="copy_to_build" hidden="true">
+        <copy todir="${buildDir}">
+            <fileset defaultexcludes="false" expandsymboliclinks="true" dir=".">
+                <include name="tests/**"/>
+                <include name="Text/**"/>
+                <include name="README"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="generate_package_xml" hidden="true" depends="copy_to_build">
         <pearPkg2 name="Text_CAPTCHA" dir=".">
             <option name="outputdirectory" value="${buildDir}"/>
             <option name="packagefile" value="package2.xml"/>
@@ -50,7 +60,7 @@
             <option name="apistability" value="beta"/>
             <option name="license" value="BSD License"/>
             <option name="notes" value="PHP5 release"/>
-            <option name="phpdep" value="5.0.0"/>
+            <option name="phpdep" value="5.1.0"/>
             <option name="packagetype" value="php"/>
             <option name="pearinstallerdep" value="1.4.6"/>
             <mapping name="maintainers">
@@ -90,15 +100,7 @@
                     <element key="optional" value="true"/>
                 </element>
             </mapping>
-            <fileset dir=".">
-                <exclude name=".idea/**"/>
-                <exclude name="${buildDir}"/>
-                <exclude name="${apiDocsDir}"/>
-                <exclude name="${pkgDir}"/>
-                <exclude name="${reportDir}"/>
-                <exclude name="build.xml"/>
-                <exclude name="package.xml"/>
-            </fileset>
+            <fileset dir="${buildDir}"/>
         </pearPkg2>
     </target>
 
@@ -113,12 +115,6 @@
     </target>
 
     <target name="package" depends="clean, test, generate_package_xml" description="Make a full release and build the package file">
-        <copy todir="${buildDir}">
-            <fileset defaultexcludes="false" expandsymboliclinks="true" dir=".">
-                <include name="tests/**"/>
-                <include name="Text/**"/>
-            </fileset>
-        </copy>
         <tar destfile="${project.basedir}/pkg/Text_CAPTCHA-${releaseVer}.tar.gz" compression="gzip"
              basedir="${buildDir}"/>
     </target>
