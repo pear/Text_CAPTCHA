@@ -24,7 +24,7 @@ class Text_CAPTCHA_Driver_Figlet_Test extends PHPUnit_Framework_TestCase
     public function testSimple()
     {
         $textOptions = array(
-            'font_file' => glob(__DIR__ . '/data/*.flf'),
+            'font_file' => glob(dirname(__FILE__) . '/data/*.flf'),
             'style' => array(
                 'border' => '1px dashed red',
                 'color' => 'yellow',

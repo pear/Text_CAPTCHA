@@ -164,7 +164,7 @@ abstract class Text_CAPTCHA
             );
         }
         $driver = basename($driver);
-        $driverFile = __DIR__ . "/CAPTCHA/Driver/$driver.php";
+        $driverFile = dirname(__FILE__) . "/CAPTCHA/Driver/$driver.php";
         if (file_exists($driverFile) && is_readable($driverFile)) {
             include_once $driverFile;
 

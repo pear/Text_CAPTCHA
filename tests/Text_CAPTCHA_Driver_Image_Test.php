@@ -25,7 +25,7 @@ class Text_CAPTCHA_Driver_Image_Test extends PHPUnit_Framework_TestCase
     {
         $imageOptions = array(
             'font_size' => 24,
-            'font_path' => __DIR__ . '/data/',
+            'font_path' => dirname(__FILE__) . '/data/',
             'font_file' => 'cour.ttf',
             'text_color' => '#DDFF99',
             'lines_color' => '#CCEEDD',
@@ -53,7 +53,7 @@ class Text_CAPTCHA_Driver_Image_Test extends PHPUnit_Framework_TestCase
     {
         $imageOptions = array(
             'font_size' => 24,
-            'font_path' => __DIR__ . '/data/',
+            'font_path' => dirname(__FILE__) . '/data/',
             'font_file' => 'cour.ttf',
             'text_color' => '#DDFF99',
             'lines_color' => '#CCEEDD',
