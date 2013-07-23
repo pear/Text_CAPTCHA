@@ -6,36 +6,40 @@
     <property name="buildDir" value="${project.basedir}/build"/>
     <property name="reportDir" value="${project.basedir}/report"/>
     <property name="pkgDir" value="${project.basedir}/pkg"/>
-    <property name="apiDocsDir" value="${project.basedir}/apidocs"/>
+    <property name="docsDir" value="${project.basedir}/apidocs"/>
+    <property name="apiDocsDir" value="${docsDir}/apidocs"/>
+    <property name="reportDocsDir" value="${docsDir}/report"/>
 
     <target name="clean" description="Clean up and create artifact directories">
         <delete dir="${buildDir}"/>
         <delete dir="${pkgDir}"/>
         <delete dir="${reportDir}"/>
         <delete dir="${apiDocsDir}"/>
+        <delete dir="${reportDocsDir}"/>
 
         <mkdir dir="${buildDir}"/>
         <mkdir dir="${pkgDir}"/>
         <mkdir dir="${reportDir}"/>
         <mkdir dir="${apiDocsDir}"/>
+        <mkdir dir="${reportDocsDir}"/>
     </target>
 
     <target name="test" description="run all Unit-Tests">
         <coverage-setup database="${reportDir}/coverage.db">
-            <fileset dir="./Text">
+            <fileset dir="${project.basedir}/Text">
                 <include name="**/*.php"/>
             </fileset>
         </coverage-setup>
         <phpunit haltonfailure="true" haltonerror="true" printsummary="true" codecoverage="true">
             <batchtest>
-                <fileset dir="./tests/">
+                <fileset dir="${project.basedir}/tests/">
                     <include name="*Test.php"/>
                 </fileset>
             </batchtest>
         </phpunit>
     </target>
 
-    <target name="copy_to_build" hidden="true">
+    <target name="copy_to_build" hidden="true" depends="clean">
         <copy todir="${buildDir}">
             <fileset defaultexcludes="false" expandsymboliclinks="true" dir=".">
                 <include name="tests/**"/>
@@ -48,7 +52,7 @@
     <target name="generate_package_xml" hidden="true" depends="copy_to_build">
         <pearPkg2 name="Text_CAPTCHA" dir=".">
             <option name="outputdirectory" value="${buildDir}"/>
-            <option name="packagefile" value="package2.xml"/>
+            <option name="packagefile" value="package.xml"/>
             <option name="baseinstalldir" value="/"/>
             <option name="channel" value="pear.php.net"/>
             <option name="summary" value="Generation of CAPTCHAs"/>
@@ -106,7 +110,7 @@
 
     <target name="phpCS" description="Find coding standard violations using PHP_CodeSniffer">
         <phpcodesniffer standard="PEAR" format="full" file="."
-                        allowedFileExtensions="php php5 inc">
+                        allowedFileExtensions="php php5 inc" haltonerror="true" haltonwarning="true">
             <fileset defaultexcludes="false" expandsymboliclinks="true" dir=".">
                 <include name="tests/**"/>
                 <include name="Text/**"/>
@@ -114,15 +118,18 @@
         </phpcodesniffer>
     </target>
 
-    <target name="package" depends="clean, test, generate_package_xml" description="Make a full release and build the package file">
+    <target name="package" depends="clean, test, phpCS, generate_package_xml, doc" description="Make a full release and build the package file">
         <tar destfile="${project.basedir}/pkg/Text_CAPTCHA-${releaseVer}.tar.gz" compression="gzip"
              basedir="${buildDir}"/>
     </target>
 
     <target name="doc" description="Generate the API Documentation">
+        <coverage-report outfile="report/coverage.xml">
+            <report usesorttable="true" toDir="${reportDocsDir}" styleDir="${project.basedir}/style"/>
+        </coverage-report>
         <phpdoc2 title="API Documentation" destdir="${apiDocsDir}"
                  template="Abstract">
-            <fileset dir="./Text">
+            <fileset dir="${buildDir}/Text">
                 <include name="**/*.php"/>
             </fileset>
         </phpdoc2>
