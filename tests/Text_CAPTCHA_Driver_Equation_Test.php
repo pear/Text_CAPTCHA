@@ -60,8 +60,40 @@ class Text_CAPTCHA_Driver_Equation_Test extends PHPUnit_Framework_TestCase
     {
         $this->_captcha->init(
             array(
+                'severity' => 2
+            )
+        );
+        $this->assertNotNull($this->_captcha->getCAPTCHA());
+        $this->assertNotNull($this->_captcha->getPhrase());
+    }
+
+    /**
+     * invalid complexity
+     *
+     * @return void
+     */
+    public function testInvalidComplexity()
+    {
+        $this->setExpectedException("Text_CAPTCHA_Exception");
+        $this->_captcha->init(
+            array(
+                'severity' => 99
+            )
+        );
+    }
+
+    /**
+     * test NumbersToText
+     *
+     * @return void
+     */
+    public function testNumbersToText()
+    {
+        $this->_captcha->init(
+            array(
                 'min' => 1,
                 'max' => 4,
+                'locale' => 'de',
                 'numbersToText' => true,
                 'severity' => 2
             )
