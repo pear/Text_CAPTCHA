@@ -10,6 +10,7 @@
  * @license  BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  */
+require_once 'Text/CAPTCHA.php';
 /**
  * Class Text_CAPTCHA_Test
  *
@@ -30,5 +31,35 @@ class Text_CAPTCHA_Test extends PHPUnit_Framework_TestCase
     {
         $this->setExpectedException("Text_CAPTCHA_Exception");
         Text_CAPTCHA::factory('invalidDriver');
+    }
+
+    /**
+     * test invalid driver name.
+     *
+     * @return void
+     */
+    public function testNoDriverName()
+    {
+        $this->setExpectedException("Text_CAPTCHA_Exception");
+        Text_CAPTCHA::factory('');
+    }
+
+    /**
+     * test generate function
+     *
+     * @return void
+     */
+    public function testGenerate()
+    {
+        $captcha = Text_CAPTCHA::factory('Word');
+        $captcha->init();
+        $phraseAfterInit = $captcha->getPhrase();
+        $captcha->generate(true);
+        $phraseAfterGenerate = $captcha->getPhrase();
+        $this->assertNotEquals($phraseAfterInit, $phraseAfterGenerate);
+        $captcha->generate("Testphrase");
+        $phraseAfterSet = $captcha->getPhrase();
+        $this->assertNotEquals($phraseAfterGenerate, $phraseAfterSet);
+        $this->assertEquals('Testphrase', $phraseAfterSet);
     }
 }
