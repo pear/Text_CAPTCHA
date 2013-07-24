@@ -1,7 +1,6 @@
 <?php
 /**
  * Text_CAPTCHA_Driver_Word - Text_CAPTCHA driver word CAPTCHAs
- *
  * Class to create a textual Turing test
  *
  * PHP version 5
@@ -31,7 +30,6 @@ class Text_CAPTCHA_Driver_Word extends Text_CAPTCHA
 {
     /**
      * Phrase length.
-     *
      * This variable holds the length of the Word.
      *
      * @var integer
@@ -40,7 +38,6 @@ class Text_CAPTCHA_Driver_Word extends Text_CAPTCHA
 
     /**
      * Numbers_Words mode.
-     *
      * This variable holds the mode for Numbers_Words.
      *
      * @var String
@@ -49,7 +46,6 @@ class Text_CAPTCHA_Driver_Word extends Text_CAPTCHA
 
     /**
      * Locale
-     *
      * This variable holds the locale for Numbers_Words
      *
      * @var string
@@ -67,7 +63,7 @@ class Text_CAPTCHA_Driver_Word extends Text_CAPTCHA
      *
      * @return void
      */
-    function init($options = array())
+    protected function initDriver($options = array())
     {
         if (isset($options['length']) && is_int($options['length'])) {
             $this->_length = $options['length'];
@@ -89,12 +85,10 @@ class Text_CAPTCHA_Driver_Word extends Text_CAPTCHA
         } else {
             $this->_locale = 'en_US';
         }
-        parent::init($options);
     }
 
     /**
      * Create random CAPTCHA phrase, "Word edition" (numbers only).
-     *
      * This method creates a random phrase
      *
      * @return void

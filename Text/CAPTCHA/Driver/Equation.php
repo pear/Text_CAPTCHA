@@ -92,11 +92,10 @@ class Text_CAPTCHA_Driver_Equation extends Text_CAPTCHA
      *                       severity      number for complexity
      *
      * @return void
-     *
      * @throws Text_CAPTCHA_Exception when numbersToText is true, but Number_Words
      *                                package is not available
      */
-    public function init($options = array())
+    protected function initDriver($options = array())
     {
         if (isset($options['min'])) {
             $this->_min = (int)$options['min'];
@@ -130,7 +129,6 @@ class Text_CAPTCHA_Driver_Equation extends Text_CAPTCHA
                 throw new Text_CAPTCHA_Exception('Number_Words package required');
             }
         }
-        parent::init($options);
     }
 
     /**
@@ -138,7 +136,6 @@ class Text_CAPTCHA_Driver_Equation extends Text_CAPTCHA
      * This method creates a random equation.
      *
      * @return void
-     *
      * @throws Text_CAPTCHA_Exception when invalid severity is specified
      */
     protected function createCAPTCHA()

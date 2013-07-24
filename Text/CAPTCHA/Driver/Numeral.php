@@ -85,7 +85,7 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      *
      * @return void
      */
-    public function init($options = array())
+    protected function initDriver($options = array())
     {
         if (isset($options['minValue'])) {
             $this->_minValue = (int)$options['minValue'];
@@ -97,7 +97,6 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
         } else {
             $this->_maxValue = 50;
         }
-        parent::init($options);
     }
 
     /**

@@ -78,7 +78,7 @@ class Text_CAPTCHA_Driver_Figlet extends Text_CAPTCHA
      * @return void
      * @throws Text_CAPTCHA_Exception when no options are given
      */
-    public function init($options = array())
+    protected function initDriver($options = array())
     {
         if (!empty($options['output'])) {
             $this->_output = (string)$options['output'];
@@ -107,29 +107,24 @@ class Text_CAPTCHA_Driver_Figlet extends Text_CAPTCHA
             $this->setPhrase($options['phrase']);
         }
 
-        if (empty($options['options']) || !is_array($options['options'])) {
-            throw new Text_CAPTCHA_Exception("No options specified");
-        } else {
-            if (!empty($options['options']['style'])
-                && is_array($options['options']['style'])
-            ) {
-                $this->_style = $options['options']['style'];
-            }
+        if (!empty($options['style'])
+            && is_array($options['style'])
+        ) {
+            $this->_style = $options['style'];
+        }
 
-            if (empty($this->_style['padding'])) {
-                $this->_style['padding'] = '5px';
-            }
+        if (empty($this->_style['padding'])) {
+            $this->_style['padding'] = '5px';
+        }
 
-            if (!empty($options['options']['font_file'])) {
-                if (is_array($options['options']['font_file'])) {
-                    $arr = $options['options']['font_file'];
-                    $this->_font = $arr[array_rand($arr)];
-                } else {
-                    $this->_font = $options['options']['font_file'];
-                }
+        if (!empty($options['font_file'])) {
+            if (is_array($options['font_file'])) {
+                $arr = $options['font_file'];
+                $this->_font = $arr[array_rand($arr)];
+            } else {
+                $this->_font = $options['font_file'];
             }
         }
-        parent::init($options);
     }
 
     /**
@@ -182,6 +177,8 @@ class Text_CAPTCHA_Driver_Figlet extends Text_CAPTCHA
         case 'javascript':
             $this->setCaptcha($this->_getCAPTCHAAsJavascript($outputString));
             break;
+        default:
+            throw new Text_CAPTCHA_Exception('Invalid output option given');
         }
     }
 

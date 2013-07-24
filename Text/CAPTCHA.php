@@ -1,7 +1,6 @@
 <?php
 /**
  * Text_CAPTCHA - creates a CAPTCHA for Turing tests.
- *
  * Base class file for using Text_CAPTCHA.
  *
  * PHP version 5
@@ -119,7 +118,6 @@ require_once 'Text/Password.php';
 */
 /**
  * Text_CAPTCHA - creates a CAPTCHA for Turing tests.
- *
  * Class to create a Turing test for websites by creating an image, ASCII art or
  * something else with some (obfuscated) characters.
  *
@@ -152,7 +150,6 @@ abstract class Text_CAPTCHA
      * @param string $driver name of driver class to initialize
      *
      * @return Text_CAPTCHA a newly created Text_CAPTCHA object
-     *
      * @throws Text_CAPTCHA_Exception when invalid driver is specified
      */
     public static function factory($driver)
@@ -197,7 +194,6 @@ abstract class Text_CAPTCHA
 
     /**
      * Sets secret CAPTCHA phrase.
-     *
      * This method sets the CAPTCHA phrase (use null for a random phrase)
      *
      * @param string $phrase The (new) phrase
@@ -211,7 +207,6 @@ abstract class Text_CAPTCHA
 
     /**
      * Return secret CAPTCHA phrase
-     *
      * This method returns the CAPTCHA phrase
      *
      * @return  string   secret phrase
@@ -246,17 +241,29 @@ abstract class Text_CAPTCHA
     }
 
     /**
-     * Place holder for the real init() method used by extended classes to
-     * initialize CAPTCHA.
+     * Reinitialize the entire Text_CAPTCHA object.
      *
      * @param array $options Options to pass in.
      *
      * @return void
      */
-    public function init($options = array())
+    public final function init($options = array())
     {
+        $this->_captcha = null;
+        $this->_phrase = null;
+        $this->initDriver($options);
         $this->generate();
     }
+
+    /**
+     * Place holder for the real init() method used by extended classes to initialize
+     * the CAPTCHA driver.
+     *
+     * @param array $options Options to pass in.
+     *
+     * @return void
+     */
+    protected abstract function initDriver($options = array());
 
     /**
      * Place holder for the real _createCAPTCHA() method

@@ -80,7 +80,7 @@ class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA
      *
      * @return void
      */
-    public function init($options = array())
+    protected function initDriver($options = array())
     {
         if (is_array($options)) {
             if (isset($options['width']) && is_int($options['width'])) {
@@ -114,7 +114,6 @@ class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA
                     $this->_imageOptions, $options['imageOptions']
                 );
             }
-            parent::init($options);
         }
     }
 
