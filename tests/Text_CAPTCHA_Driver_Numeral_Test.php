@@ -37,7 +37,6 @@ class Text_CAPTCHA_Driver_Numeral_Test extends PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->_captcha = Text_CAPTCHA::factory("Numeral");
-        $this->_captcha->init();
     }
 
     /**
@@ -47,7 +46,52 @@ class Text_CAPTCHA_Driver_Numeral_Test extends PHPUnit_Framework_TestCase
      */
     public function testSimple()
     {
+        $this->_captcha->init();
         $this->assertNotNull($this->_captcha->getCAPTCHA());
         $this->assertNotNull($this->_captcha->getPhrase());
+    }
+
+    /**
+     * test min/maxValue
+     *
+     * @return void
+     */
+    public function testMinMaxValue()
+    {
+        $this->_captcha->init(
+            array(
+                'minValue' => 52,
+                'maxValue' => 52,
+                'operator' => '-'
+            )
+        );
+        $this->assertNotNull($this->_captcha->getCAPTCHA());
+        $this->assertEquals(0, $this->_captcha->getPhrase());
+    }
+
+    /**
+     * test operator
+     *
+     * @return void
+     */
+    public function testOperator()
+    {
+        $this->_captcha->init(array('operator' => '-'));
+        $captcha = $this->_captcha->getCAPTCHA();
+        $function = create_function('', 'return ' . $captcha . ';');
+        $this->assertNotNull($captcha);
+        $this->assertEquals($function(), $this->_captcha->getPhrase());
+
+        $this->_captcha->init(array('operator' => '+'));
+        $captcha = $this->_captcha->getCAPTCHA();
+        $function = create_function('', 'return ' . $captcha . ';');
+        $this->assertNotNull($captcha);
+        $this->assertEquals($function(), $this->_captcha->getPhrase());
+
+        $this->_captcha->init(array('operator' => '**'));
+        $captcha = $this->_captcha->getCAPTCHA();
+        $function = create_function('', 'return ' . $captcha . ';');
+        $this->assertNotNull($captcha);
+        $this->assertEquals($function(), $this->_captcha->getPhrase());
     }
 }
