@@ -63,16 +63,27 @@
             <option name="apiversion" value="${apiVer}"/>
             <option name="apistability" value="beta"/>
             <option name="license" value="BSD License"/>
-            <option name="notes" value="PHP5 release"/>
+            <option name="notes">
+PHP5 release
+* use phing to build package
+* extend test cases
+            </option>
             <option name="phpdep" value="5.1.0"/>
             <option name="packagetype" value="php"/>
             <option name="pearinstallerdep" value="1.4.6"/>
             <mapping name="maintainers">
                 <element>
+                    <element key="handle" value="bigmichi1"/>
+                    <element key="name" value="Michael Cramer"/>
+                    <element key="email" value="michael@bigmichi1.de"/>
+                    <element key="role" value="lead"/>
+                </element>
+                <element>
                     <element key="handle" value="wenz"/>
                     <element key="name" value="Christian Wenz"/>
                     <element key="email" value="wenz@php.net"/>
                     <element key="role" value="lead"/>
+                    <element key="active" value="false"/>
                 </element>
             </mapping>
             <mapping name="deps">
