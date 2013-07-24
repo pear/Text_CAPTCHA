@@ -97,6 +97,11 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
         } else {
             $this->_maxValue = 50;
         }
+        if (isset($options['operator'])) {
+            $this->_operator = $options['operator'];
+        } else {
+            $this->_operator = '';
+        }
     }
 
     /**
@@ -115,7 +120,9 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
     {
         $this->_firstNumber = $this->_generateNumber();
         $this->_secondNumber = $this->_generateNumber();
-        $this->_operator = $this->_operators[array_rand($this->_operators)];
+        if (empty($this->_operator)) {
+            $this->_operator = $this->_operators[array_rand($this->_operators)];
+        }
         $this->_generateOperation();
     }
 
