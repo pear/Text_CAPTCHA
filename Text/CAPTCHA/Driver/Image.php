@@ -201,8 +201,10 @@ class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA
             $this->setCaptcha($this->_getCAPTCHAAsGIF($image));
             break;
         case 'resource':
-        default:
             $this->setCaptcha($image);
+            break;
+        default:
+            throw new Text_CAPTCHA_Exception("Unknown output type specified");
         }
     }
 
