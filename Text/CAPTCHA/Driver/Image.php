@@ -214,21 +214,14 @@ class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA
      * @param resource $image generated image
      *
      * @return string image contents
-     * @throws Text_CAPTCHA_Exception when image is not a valid resource
      */
     private function _getCAPTCHAAsPNG($image)
     {
-        if (is_resource($image)) {
-            ob_start();
-            imagepng($image);
-            $data = ob_get_contents();
-            ob_end_clean();
-            return $data;
-        } else {
-            throw new Text_CAPTCHA_Exception(
-                'Error creating CAPTCHA image'
-            );
-        }
+        ob_start();
+        imagepng($image);
+        $data = ob_get_contents();
+        ob_end_clean();
+        return $data;
     }
 
     /**
@@ -239,21 +232,14 @@ class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA
      * @param resource $image generated image
      *
      * @return string image contents
-     * @throws Text_CAPTCHA_Exception when image is not a valid resource
      */
     private function _getCAPTCHAAsJPEG($image)
     {
-        if (is_resource($image)) {
-            ob_start();
-            imagejpeg($image);
-            $data = ob_get_contents();
-            ob_end_clean();
-            return $data;
-        } else {
-            throw new Text_CAPTCHA_Exception(
-                'Error creating CAPTCHA image'
-            );
-        }
+        ob_start();
+        imagejpeg($image);
+        $data = ob_get_contents();
+        ob_end_clean();
+        return $data;
     }
 
     /**
@@ -264,21 +250,14 @@ class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA
      * @param resource $image generated image
      *
      * @return string image contents
-     * @throws Text_CAPTCHA_Exception when image is not a valid resource
      */
     private function _getCAPTCHAAsGIF($image)
     {
-        if (is_resource($image)) {
-            ob_start();
-            imagegif($image);
-            $data = ob_get_contents();
-            ob_end_clean();
-            return $data;
-        } else {
-            throw new Text_CAPTCHA_Exception(
-                'Error creating CAPTCHA image'
-            );
-        }
+        ob_start();
+        imagegif($image);
+        $data = ob_get_contents();
+        ob_end_clean();
+        return $data;
     }
 
     /**
