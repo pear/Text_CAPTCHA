@@ -94,4 +94,47 @@ class Text_CAPTCHA_Driver_Numeral_Test extends PHPUnit_Framework_TestCase
         $this->assertNotNull($captcha);
         $this->assertEquals($function(), $this->_captcha->getPhrase());
     }
+
+    /**
+     * test difference
+     *
+     * @return void
+     */
+    public function testDifference()
+    {
+        $this->_captcha->init(
+            array('firstValue' => 5, 'secondValue' => 10, 'operator' => '-')
+        );
+        $captcha = $this->_captcha->getCAPTCHA();
+        $function = create_function('', 'return ' . $captcha . ';');
+        $this->assertNotNull($captcha);
+        $this->assertEquals($function(), $this->_captcha->getPhrase());
+        $this->assertEquals(5, $function());
+
+        $this->_captcha->init(
+            array('firstValue' => 10, 'secondValue' => 5, 'operator' => '-')
+        );
+        $captcha = $this->_captcha->getCAPTCHA();
+        $function = create_function('', 'return ' . $captcha . ';');
+        $this->assertNotNull($captcha);
+        $this->assertEquals($function(), $this->_captcha->getPhrase());
+        $this->assertEquals(5, $function());
+    }
+
+    /**
+     * test difference
+     *
+     * @return void
+     */
+    public function testAdd()
+    {
+        $this->_captcha->init(
+            array('firstValue' => 5, 'secondValue' => 10, 'operator' => '+')
+        );
+        $captcha = $this->_captcha->getCAPTCHA();
+        $function = create_function('', 'return ' . $captcha . ';');
+        $this->assertNotNull($captcha);
+        $this->assertEquals($function(), $this->_captcha->getPhrase());
+        $this->assertEquals(15, $function());
+    }
 }

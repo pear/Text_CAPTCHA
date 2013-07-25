@@ -102,6 +102,16 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
         } else {
             $this->_operator = '';
         }
+        if (isset($options['firstValue'])) {
+            $this->_firstNumber = (int)$options['firstValue'];
+        } else {
+            $this->_firstNumber = 0;
+        }
+        if (isset($options['secondValue'])) {
+            $this->_secondNumber = (int)$options['secondValue'];
+        } else {
+            $this->_secondNumber = 0;
+        }
     }
 
     /**
@@ -118,8 +128,12 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      */
     protected function createCAPTCHA()
     {
-        $this->_firstNumber = $this->_generateNumber();
-        $this->_secondNumber = $this->_generateNumber();
+        if ($this->_firstNumber == 0) {
+            $this->_firstNumber = $this->_generateNumber();
+        }
+        if ($this->_secondNumber == 0) {
+            $this->_secondNumber = $this->_generateNumber();
+        }
         if (empty($this->_operator)) {
             $this->_operator = $this->_operators[array_rand($this->_operators)];
         }
