@@ -211,5 +211,6 @@ class Text_CAPTCHA_Driver_Equation extends Text_CAPTCHA
      */
     protected function createPhrase()
     {
+        $this->setPhrase(null);
     }
 }

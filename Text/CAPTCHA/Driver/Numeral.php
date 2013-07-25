@@ -249,5 +249,6 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      */
     protected function createPhrase()
     {
+        $this->setCaptcha(null);
     }
 }
