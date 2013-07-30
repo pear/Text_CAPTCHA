@@ -8,6 +8,7 @@
  * @package  Text_CAPTCHA
  * @author   Aaron Wormus <wormus@php.net>
  * @author   Christian Wenz <wenz@php.net>
+ * @author   Michael Cramer <michael@bigmichi1.de>
  * @license  BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  */
