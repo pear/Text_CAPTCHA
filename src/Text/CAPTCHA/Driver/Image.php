@@ -8,7 +8,7 @@
  * @package  Text_CAPTCHA
  * @author   Christian Wenz <wenz@php.net>
  * @author   Michael Cramer <michael@bigmichi1.de>
- * @license  BSD License
+ * @license  http://www.opensource.org/licenses/bsd-license.php BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  */
 require_once 'Text/CAPTCHA.php';
@@ -23,7 +23,7 @@ require_once 'Image/Text.php';
  * @package  Text_CAPTCHA
  * @author   Christian Wenz <wenz@php.net>
  * @author   Michael Cramer <michael@bigmichi1.de>
- * @license  BSD License
+ * @license  http://www.opensource.org/licenses/bsd-license.php BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  * @todo     refine the obfuscation algorithm :-)
  * @todo     consider removing Image_Text dependency

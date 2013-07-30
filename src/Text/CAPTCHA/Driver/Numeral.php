@@ -9,7 +9,7 @@
  * @author   David Coallier <davidc@agoraproduction.com>
  * @author   Christian Wenz <wenz@php.net>
  * @author   Michael Cramer <michael@bigmichi1.de>
- * @license  BSD License
+ * @license  http://www.opensource.org/licenses/bsd-license.php BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  */
 require_once 'Text/CAPTCHA.php';
@@ -25,7 +25,7 @@ require_once 'Text/CAPTCHA.php';
  * @author   David Coallier <davidc@agoraproduction.com>
  * @author   Christian Wenz <wenz@php.net>
  * @author   Michael Cramer <michael@bigmichi1.de>
- * @license  BSD License
+ * @license  http://www.opensource.org/licenses/bsd-license.php BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  */
 class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
