@@ -145,7 +145,7 @@
 
     <target name="phpdoc" depends="init" description="Generate API documentation">
         <phpdoc2 title="${phing.project.name} ${project.version}" destdir="${build.api.dir}" template="abstract">
-            <fileset dir="${src.dir}"/>
+            <fileset refid="php.files"/>
         </phpdoc2>
     </target>
 
