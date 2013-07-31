@@ -216,10 +216,16 @@
 
             <changelog version="0.5.0" api_version="0.5.0" date="2013-07-30" stability="beta" license="New BSD">
                 <!--        Don't exceed this width         -->
-                PHP5 release
+                First PHP5 release
 
                 * use phing to build package
                 * extend test cases
+                * Bug #19858 Figlet: _createPhrase duplicates
+                  parent method
+                * Bug #19891 undefined function init()
+                * Request #19854 No reason for Figlet
+                  double-options:
+                  $options['options']['font_file']
             </changelog>
 
             <changelog version="0.4.1" api_version="0.4.0" date="2010-10-25" stability="alpha" license="New BSD">
