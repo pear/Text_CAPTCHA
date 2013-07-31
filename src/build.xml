@@ -29,6 +29,7 @@
         <property name="src.dir" value="${project.dir}\src"/>
         <property name="docs.dir" value="${project.dir}\docs"/>
         <property name="tests.dir" value="${project.dir}\tests"/>
+        <property name="examples.dir" value="${project.dir}\examples"/>
 
         <echo message="Assigning build directories to properties" level="debug"/>
         <property name="build.api.dir" value="${build.dir}/api"/>
@@ -180,6 +181,10 @@
         <copy todir="${build.dist.temp.dir}/tests" haltonerror="true">
             <fileset dir="${tests.dir}"/>
         </copy>
+        <mkdir dir="${build.dist.temp.dir}/examples"/>
+        <copy todir="${build.dist.temp.dir}/examples" haltonerror="true">
+            <fileset dir="${examples.dir}"/>
+        </copy>
     </target>
 
     <target name="-generate-package-xml" depends="-copy-to-build" hidden="true">
@@ -203,6 +208,7 @@
             <stability release="beta" api="beta"/>
             <license>New BSD</license>
             <dirroles key="/tests" value="test"/>
+            <dirroles key="/examples" value="doc"/>
 
             <dependencies>
                 <php minimum_version="5.1.0"/>
