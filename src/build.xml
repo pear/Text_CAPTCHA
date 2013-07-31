@@ -165,9 +165,9 @@
     </target>
 
     <target name="dist" depends="init, clean, -generate-package-xml" description="Create distributable file">
-        <zip destfile="${build.dist.dir}/${phing.project.name}-${project.version}.zip">
+        <tar destfile="${build.dist.dir}/${phing.project.name}-${project.version}.tgz" compression="gzip">
             <fileset dir="${build.dist.temp.dir}/"/>
-        </zip>
+        </tar>
 
         <delete dir="${build.dist.temp.dir}"/>
     </target>
@@ -221,11 +221,11 @@
                 * use phing to build package
                 * extend test cases
                 * Bug #19858 Figlet: _createPhrase duplicates
-                  parent method
+                parent method
                 * Bug #19891 undefined function init()
                 * Request #19854 No reason for Figlet
-                  double-options:
-                  $options['options']['font_file']
+                double-options:
+                $options['options']['font_file']
             </changelog>
 
             <changelog version="0.4.1" api_version="0.4.0" date="2010-10-25" stability="alpha" license="New BSD">
