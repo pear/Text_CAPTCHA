@@ -59,28 +59,24 @@ abstract class Text_CAPTCHA
      * @param string $driver name of driver class to initialize
      *
      * @return Text_CAPTCHA a newly created Text_CAPTCHA object
-     * @throws Text_CAPTCHA_Exception when invalid driver is specified
+     * @throws Text_CAPTCHA_Exception when driver could not be loaded
+     *
      */
     public static function factory($driver)
     {
-        if ($driver == '') {
-            throw new Text_CAPTCHA_Exception(
-                'No CAPTCHA type specified ... aborting. ' .
-                'You must call ::factory() with one parameter, the CAPTCHA type.'
-            );
-        }
         $driver = basename($driver);
-        $driverFile = dirname(__FILE__) . "/CAPTCHA/Driver/$driver.php";
-        if (file_exists($driverFile) && is_readable($driverFile)) {
-            include_once $driverFile;
-
-            $classname = "Text_CAPTCHA_Driver_$driver";
-            return new $classname;
-        } else {
+        $class = 'Text_CAPTCHA_Driver_' . $driver;
+        $file = str_replace('_', '/', $class) . '.php';
+        //check if it exists and can be loaded
+        if (!@fclose(@fopen($file, 'r', true))) {
             throw new Text_CAPTCHA_Exception(
-                'Invalid CAPTCHA type specified ... aborting.'
+                'Driver ' . $driver . ' cannot be loaded.'
             );
         }
+        //continue with including the driver
+        include_once $file;
+
+        return new $class;
     }
 
     /**
