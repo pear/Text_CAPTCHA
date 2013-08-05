@@ -154,7 +154,7 @@
         <coverage-setup database="${build.logs.dir}/coverage.db">
             <fileset refid="php.files"/>
         </coverage-setup>
-        <phpunit printsummary="true" haltonerror="true" haltonfailure="true">
+        <phpunit printsummary="true" haltonerror="true" haltonfailure="true" codecoverage="true">
             <formatter todir="${build.logs.dir}" type="xml"/>
             <batchtest>
                 <fileset refid="test.files"/>
