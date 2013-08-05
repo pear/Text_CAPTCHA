@@ -185,26 +185,20 @@ class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA_Driver_Base
             imagearc($image, $cx, $cy, $w, $w, 0, 360, $linesColor);
         }
 
-        if ($this->_output == 'gif' && !function_exists('imagegif')) {
-            $this->_output = 'png';
-        }
-
-        switch ($this->_output) {
-        case 'png':
-            $this->setCaptcha($this->_getCAPTCHAAsPNG($image));
-            break;
-        case 'jpg':
-        case 'jpeg':
-            $this->setCaptcha($this->_getCAPTCHAAsJPEG($image));
-            break;
-        case 'gif':
+        if ($this->_output == 'gif' && imagetypes() & IMG_GIF) {
             $this->setCaptcha($this->_getCAPTCHAAsGIF($image));
-            break;
-        case 'resource':
+        } else if (($this->_output == 'jpg' && imagetypes() & IMG_JPG)
+            || ($this->_output == 'jpeg' && imagetypes() & IMG_JPEG)
+        ) {
+            $this->setCaptcha($this->_getCAPTCHAAsJPEG($image));
+        } else if ($this->_output == 'png' && imagetypes() & IMG_PNG) {
+            $this->setCaptcha($this->_getCAPTCHAAsPNG($image));
+        } else if ($this->_output == 'resource') {
             $this->setCaptcha($image);
-            break;
-        default:
-            throw new Text_CAPTCHA_Exception("Unknown output type specified");
+        } else {
+            throw new Text_CAPTCHA_Exception(
+                "Unknown or unsupported output type specified"
+            );
         }
     }
 
