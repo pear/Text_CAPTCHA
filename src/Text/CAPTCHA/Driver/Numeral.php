@@ -12,7 +12,7 @@
  * @license  http://www.opensource.org/licenses/bsd-license.php BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  */
-require_once 'Text/CAPTCHA.php';
+require_once 'Text/CAPTCHA/Driver/Base.php';
 /**
  * Class used for numeral captchas
  *
@@ -28,7 +28,7 @@ require_once 'Text/CAPTCHA.php';
  * @license  http://www.opensource.org/licenses/bsd-license.php BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  */
-class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
+class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA_Driver_Base
 {
     /**
      * This variable holds the minimum range value default set to "1".
@@ -85,7 +85,7 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      *
      * @return void
      */
-    protected function initDriver($options = array())
+    public function initDriver($options = array())
     {
         if (isset($options['minValue'])) {
             $this->_minValue = (int)$options['minValue'];
@@ -126,7 +126,7 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      * @see _generateOperator()
      * @see _generateOperation()
      */
-    protected function createCAPTCHA()
+    public function createCAPTCHA()
     {
         if ($this->_firstNumber == 0) {
             $this->_firstNumber = $this->_generateNumber();
@@ -261,7 +261,7 @@ class Text_CAPTCHA_Driver_Numeral extends Text_CAPTCHA
      *
      * @return string
      */
-    protected function createPhrase()
+    public function createPhrase()
     {
         $this->setCaptcha(null);
     }

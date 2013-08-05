@@ -11,7 +11,7 @@
  * @license  http://www.opensource.org/licenses/bsd-license.php BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  */
-require_once 'Text/CAPTCHA.php';
+require_once 'Text/CAPTCHA/Driver/Base.php';
 require_once 'Image/Text.php';
 
 /**
@@ -28,7 +28,7 @@ require_once 'Image/Text.php';
  * @todo     refine the obfuscation algorithm :-)
  * @todo     consider removing Image_Text dependency
  */
-class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA
+class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA_Driver_Base
 {
     /**
      * Text_Password options.
@@ -80,7 +80,7 @@ class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA
      *
      * @return void
      */
-    protected function initDriver($options = array())
+    public function initDriver($options = array())
     {
         if (is_array($options)) {
             if (isset($options['width']) && is_int($options['width'])) {
@@ -126,7 +126,7 @@ class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA
      * @throws Text_CAPTCHA_Exception when image generation with Image_Text produces
      *               an error
      */
-    protected function createCAPTCHA()
+    public function createCAPTCHA()
     {
         $options['canvas'] = array(
             'width' => $this->_width,
@@ -270,7 +270,7 @@ class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA
      *
      * @return void
      */
-    protected function createPhrase()
+    public function createPhrase()
     {
         $len = intval(min(8, $this->_width / 25));
         $options = $this->_textPasswordOptions;

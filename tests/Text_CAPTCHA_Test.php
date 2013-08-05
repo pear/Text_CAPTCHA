@@ -62,4 +62,27 @@ class Text_CAPTCHA_Test extends PHPUnit_Framework_TestCase
         $this->assertNotEquals($phraseAfterGenerate, $phraseAfterSet);
         $this->assertEquals('Testphrase', $phraseAfterSet);
     }
+
+    /**
+     * test driver init.
+     *
+     * @return void
+     */
+    public function testInit()
+    {
+        $this->setExpectedException("Text_CAPTCHA_Exception");
+        $captcha = Text_CAPTCHA::factory('Word');
+        $captcha->generate();
+    }
+
+    /**
+     * test null driver in constructor.
+     *
+     * @return void
+     */
+    public function testNullDriver()
+    {
+        $this->setExpectedException("Text_CAPTCHA_Exception");
+        new Text_CAPTCHA(null);
+    }
 }

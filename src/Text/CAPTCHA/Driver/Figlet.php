@@ -12,7 +12,7 @@
  * @license  http://www.opensource.org/licenses/bsd-license.php BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  */
-require_once 'Text/CAPTCHA.php';
+require_once 'Text/CAPTCHA/Driver/Base.php';
 require_once 'Text/Figlet.php';
 /**
  * Text_CAPTCHA_Driver_Figlet - Text_CAPTCHA driver Figlet based CAPTCHAs
@@ -25,7 +25,7 @@ require_once 'Text/Figlet.php';
  * @link     http://pear.php.net/package/Text_CAPTCHA
  * @todo     define an obfuscation algorithm
  */
-class Text_CAPTCHA_Driver_Figlet extends Text_CAPTCHA
+class Text_CAPTCHA_Driver_Figlet extends Text_CAPTCHA_Driver_Base
 {
     /**
      * Text_Password options.
@@ -79,7 +79,7 @@ class Text_CAPTCHA_Driver_Figlet extends Text_CAPTCHA
      * @return void
      * @throws Text_CAPTCHA_Exception when no options are given
      */
-    protected function initDriver($options = array())
+    public function initDriver($options = array())
     {
         if (!empty($options['output'])) {
             $this->_output = (string)$options['output'];
@@ -133,7 +133,7 @@ class Text_CAPTCHA_Driver_Figlet extends Text_CAPTCHA
      *
      * @return string
      */
-    protected function createPhrase()
+    public function createPhrase()
     {
         $options = $this->_textPasswordOptions;
         $textPassword = new Text_Password();
@@ -158,7 +158,7 @@ class Text_CAPTCHA_Driver_Figlet extends Text_CAPTCHA
      * @return void on error
      * @throws Text_CAPTCHA_Exception when loading font fails
      */
-    protected function createCAPTCHA()
+    public function createCAPTCHA()
     {
         $pear = new PEAR();
         $figlet = new Text_Figlet();

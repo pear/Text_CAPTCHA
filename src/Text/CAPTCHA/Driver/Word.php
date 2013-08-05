@@ -13,7 +13,7 @@
  * @license  http://www.opensource.org/licenses/bsd-license.php BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  */
-require_once 'Text/CAPTCHA.php';
+require_once 'Text/CAPTCHA/Driver/Base.php';
 require_once 'Numbers/Words.php';
 /**
  * Require Numbers_Words class for generating the text.
@@ -26,7 +26,7 @@ require_once 'Numbers/Words.php';
  * @license  http://www.opensource.org/licenses/bsd-license.php BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  */
-class Text_CAPTCHA_Driver_Word extends Text_CAPTCHA
+class Text_CAPTCHA_Driver_Word extends Text_CAPTCHA_Driver_Base
 {
     /**
      * Phrase length.
@@ -63,7 +63,7 @@ class Text_CAPTCHA_Driver_Word extends Text_CAPTCHA
      *
      * @return void
      */
-    protected function initDriver($options = array())
+    public function initDriver($options = array())
     {
         if (isset($options['length']) && is_int($options['length'])) {
             $this->_length = $options['length'];
@@ -93,7 +93,7 @@ class Text_CAPTCHA_Driver_Word extends Text_CAPTCHA
      *
      * @return void
      */
-    protected function createPhrase()
+    public function createPhrase()
     {
         $phrase = new Text_Password();
         $this->setPhrase(
@@ -109,7 +109,7 @@ class Text_CAPTCHA_Driver_Word extends Text_CAPTCHA
      *
      * @return void
      */
-    protected function createCAPTCHA()
+    public function createCAPTCHA()
     {
         $res = '';
         $numberWords = new Numbers_Words();

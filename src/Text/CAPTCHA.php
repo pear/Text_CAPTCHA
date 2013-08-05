@@ -11,11 +11,6 @@
  * @license  http://www.opensource.org/licenses/bsd-license.php BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  */
-
-/**
- * Require PEAR class for error handling.
- */
-require_once 'PEAR.php';
 /**
  * Require Exception class for error handling.
  */
@@ -37,21 +32,37 @@ require_once 'Text/Password.php';
  * @license  http://www.opensource.org/licenses/bsd-license.php BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  */
-abstract class Text_CAPTCHA
+class Text_CAPTCHA
 {
     /**
-     * Captcha
+     * driver for Text_CAPTCHA
      *
-     * @var object|string
+     * @var Text_CAPTCHA_Driver_Base
      */
-    private $_captcha;
+    private $_driver;
 
     /**
-     * Phrase
+     * check if an initial driver init was done.
      *
-     * @var string
+     * @var bool
      */
-    private $_phrase;
+    private $_driverInitDone = false;
+
+    /**
+     * Constructor for the TEXT_CAPTCHA object with the given driver.
+     *
+     * @param Text_CAPTCHA_Driver $driver driver
+     *
+     * @throws Text_CAPTCHA_Exception no driver given
+     */
+    function __construct($driver)
+    {
+        if (is_null($driver)) {
+            throw new Text_CAPTCHA_Exception("No driver given");
+        }
+        $this->_driver = $driver;
+        $this->_driverInitDone = false;
+    }
 
     /**
      * Create a new Text_CAPTCHA object.
@@ -76,7 +87,9 @@ abstract class Text_CAPTCHA
         //continue with including the driver
         include_once $file;
 
-        return new $class;
+        $driver = new $class;
+
+        return new Text_CAPTCHA($driver);
     }
 
     /**
@@ -86,63 +99,19 @@ abstract class Text_CAPTCHA
      *                                  one
      *
      * @return void
+     * @throws Text_CAPTCHA_Exception when driver is not initialized
      */
     public final function generate($newPhrase = false)
     {
-        if ($newPhrase === true || empty($this->_phrase)) {
-            $this->createPhrase();
-        } else if (strlen($newPhrase) > 0) {
-            $this->setPhrase($newPhrase);
+        if (!$this->_driverInitDone) {
+            throw new Text_CAPTCHA_Exception("Driver not initialized");
         }
-        $this->createCAPTCHA();
-    }
-
-    /**
-     * Sets secret CAPTCHA phrase.
-     * This method sets the CAPTCHA phrase (use null for a random phrase)
-     *
-     * @param string $phrase The (new) phrase
-     *
-     * @return void
-     */
-    protected final function setPhrase($phrase)
-    {
-        $this->_phrase = $phrase;
-    }
-
-    /**
-     * Return secret CAPTCHA phrase
-     * This method returns the CAPTCHA phrase
-     *
-     * @return  string   secret phrase
-     */
-    public final function getPhrase()
-    {
-        return $this->_phrase;
-    }
-
-    /**
-     * Sets the generated captcha.
-     *
-     * @param object|string $captcha the generated captcha
-     *
-     * @return void
-     */
-    protected final function setCaptcha($captcha)
-    {
-        $this->_captcha = $captcha;
-    }
-
-    /**
-     * Place holder for the real getCAPTCHA() method
-     * used by extended classes to return the generated CAPTCHA
-     * (as an image resource, as an ASCII text, ...)
-     *
-     * @return string|object
-     */
-    public final function getCAPTCHA()
-    {
-        return $this->_captcha;
+        if ($newPhrase === true || is_null($this->_driver->getPhrase())) {
+            $this->_driver->createPhrase();
+        } else if (strlen($newPhrase) > 0) {
+            $this->_driver->setPhrase($newPhrase);
+        }
+        $this->_driver->createCAPTCHA();
     }
 
     /**
@@ -154,34 +123,30 @@ abstract class Text_CAPTCHA
      */
     public final function init($options = array())
     {
-        $this->_captcha = null;
-        $this->_phrase = null;
-        $this->initDriver($options);
+        $this->_driver->resetDriver();
+        $this->_driver->initDriver($options);
+        $this->_driverInitDone = true;
         $this->generate();
     }
 
     /**
-     * Place holder for the real init() method used by extended classes to initialize
-     * the CAPTCHA driver.
+     * Place holder for the real getCAPTCHA() method used by extended classes to
+     * return the generated CAPTCHA (as an image resource, as an ASCII text, ...).
      *
-     * @param array $options Options to pass in.
-     *
-     * @return void
+     * @return string|object
      */
-    protected abstract function initDriver($options = array());
+    public final function getCAPTCHA()
+    {
+        return $this->_driver->getCAPTCHA();
+    }
 
     /**
-     * Place holder for the real _createCAPTCHA() method
-     * used by extended classes to generate CAPTCHA from phrase
+     * Return secret CAPTCHA phrase.
      *
-     * @return void
+     * @return string secret phrase
      */
-    protected abstract function createCAPTCHA();
-
-    /**
-     * Create the passphrase.
-     *
-     * @return void
-     */
-    protected abstract function createPhrase();
+    public final function getPhrase()
+    {
+        return $this->_driver->getPhrase();
+    }
 }

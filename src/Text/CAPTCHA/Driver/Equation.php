@@ -13,8 +13,7 @@
  * @license  http://www.opensource.org/licenses/bsd-license.php BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  */
-require_once 'Text/CAPTCHA.php';
-require_once 'PEAR/Exception.php';
+require_once 'Text/CAPTCHA/Driver/Base.php';
 /**
  * Equation driver for Text_CAPTCHA.
  * Returns simple equations as string, e.g. "9 - 2"
@@ -27,7 +26,7 @@ require_once 'PEAR/Exception.php';
  * @license  http://www.opensource.org/licenses/bsd-license.php BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  */
-class Text_CAPTCHA_Driver_Equation extends Text_CAPTCHA
+class Text_CAPTCHA_Driver_Equation extends Text_CAPTCHA_Driver_Base
 {
     /**
      * Operators that may be used in the equation. Two numbers have to be filled in,
@@ -95,7 +94,7 @@ class Text_CAPTCHA_Driver_Equation extends Text_CAPTCHA
      * @throws Text_CAPTCHA_Exception when numbersToText is true, but Number_Words
      *                                package is not available
      */
-    protected function initDriver($options = array())
+    public function initDriver($options = array())
     {
         if (isset($options['min'])) {
             $this->_min = (int)$options['min'];
@@ -138,7 +137,7 @@ class Text_CAPTCHA_Driver_Equation extends Text_CAPTCHA
      * @return void
      * @throws Text_CAPTCHA_Exception when invalid severity is specified
      */
-    protected function createCAPTCHA()
+    public function createCAPTCHA()
     {
         switch ($this->_severity) {
         case 1:
@@ -209,7 +208,7 @@ class Text_CAPTCHA_Driver_Equation extends Text_CAPTCHA
      * @return void
      * @see createCAPTCHA()
      */
-    protected function createPhrase()
+    public function createPhrase()
     {
         $this->setPhrase(null);
     }
