@@ -12,6 +12,7 @@
  * @license  http://www.opensource.org/licenses/bsd-license.php BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  */
+require_once 'PEAR/Exception.php';
 /**
  * Exception for Text_CAPTCHA
  *
@@ -21,7 +22,7 @@
  * @license  http://www.opensource.org/licenses/bsd-license.php BSD License
  * @link     http://pear.php.net/package/Text_CAPTCHA
  */
-class Text_CAPTCHA_Exception extends Exception
+class Text_CAPTCHA_Exception extends PEAR_Exception
 {
 
 }
