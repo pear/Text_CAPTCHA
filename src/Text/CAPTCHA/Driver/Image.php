@@ -200,6 +200,8 @@ class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA_Driver_Base
                 "Unknown or unsupported output type specified"
             );
         }
+
+        imagedestroy($image);
     }
 
     /**
