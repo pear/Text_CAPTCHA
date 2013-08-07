@@ -161,7 +161,7 @@ class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA_Driver_Base
             imageantialias($image, true);
         }
 
-        $colors = $imageText->_convertString2RGB(
+        $colors = Image_Text::convertString2RGB(
             $this->_imageOptions['lines_color']
         );
         $linesColor = imagecolorallocate(

@@ -230,7 +230,7 @@
                 <package name="Text_Password" channel="pear.php.net" minimum_version="1.1.1"/>
                 <package name="Numbers_Words" channel="pear.php.net" type="optional"/>
                 <package name="Text_Figlet" channel="pear.php.net" type="optional"/>
-                <package name="Image_Text" channel="pear.php.net" minimum_version="0.6.1" type="optional"/>
+                <package name="Image_Text" channel="pear.php.net" minimum_version="0.7.0" type="optional"/>
                 <extension name="gd" type="optional"/>
             </dependencies>
 
@@ -246,6 +246,7 @@
                 * Request #19854 No reason for Figlet
                 double-options:
                 $options['options']['font_file']
+                * dependency for Image_Text to version 0.7.0
             </changelog>
 
             <changelog version="0.4.1" api_version="0.4.0" date="2010-10-25" stability="alpha" license="New BSD">
