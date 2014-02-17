@@ -189,6 +189,7 @@
         </tar>
 
         <delete dir="${build.dist.temp.dir}"/>
+        <delete file="${build.dist.dir}/package.xml"/>
     </target>
 
     <target name="-copy-to-build" hidden="true">
@@ -209,7 +210,7 @@
     </target>
 
     <target name="-generate-package-xml" depends="-copy-to-build" hidden="true">
-        <d51pearpkg2 dir="${build.dist.temp.dir}" baseInstallDir="/" type="php">
+        <d51pearpkg2 dir="${build.dist.dir}" baseInstallDir="/" type="php">
             <name>Text_CAPTCHA</name>
             <channel>pear.php.net</channel>
             <summary>Generation of CAPTCHAs</summary>
