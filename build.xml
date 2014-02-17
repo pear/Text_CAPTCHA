@@ -1,35 +1,47 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<project name="Text_CAPTCHA" default="build" basedir=".">
+<project name="Text_CAPTCHA" default="package" basedir="src">
+    <!--
+    Build.xml file for Text_CAPTCHA
+
+    Uses phing to create releases, and pear packages.
+
+    Requires the d51PearPkg2 to be installed:
+
+    pear channel-discover pear.cakephp.org
+    pear install cakephp/Phing_d51PearPkg2Task
+    -->
     <includepath classpath="${project.basedir}/src"/>
+
+    <property name="project.cleaned" value="false"/>
+    <property name="project.dir" value="${project.basedir}"/>
+
     <taskdef classname="phing.tasks.ext.d51PearPkg2Task" name="d51pearpkg2"/>
 
-    <target name="build" depends="init, clean, verify, analyze, dist, docs" description="Do a full build"/>
+    <target name="package" depends="init, clean, verify, test, dist, docs" description="Do a full build"/>
 
     <target name="verify" depends="init, clean, lint" description="Verify the quality of the code"/>
 
-    <target name="analyze" depends="init, clean, phploc, pdepend, phpmd, phpcs, phpcpd, phpunit" description="Do static analysis of the code"/>
+    <target name="test" depends="init, clean, phploc, pdepend, phpmd, phpcs, phpcpd, phpunit" description="Do static analysis of the code"/>
 
     <target name="docs" depends="init, clean, phpdoc, phpcb"/>
 
-    <target name="init" depends="-load-properties, -setup-dirs, -setup-filesets" unless="project.initialised" hidden="true">
-        <property name="project.initialised" value="true"/>
-    </target>
+    <target name="init" depends="-load-properties, -setup-dirs, -setup-filesets" hidden="true"/>
 
     <target name="-load-properties" hidden="true">
-        <property name="project.version" value="0.5.0"/>
-        <property name="project.api.version" value="0.5.0"/>
+        <property name="project.version" value="1.0.0"/>
+        <property name="project.api.version" value="1.0.0"/>
     </target>
 
     <target name="-setup-dirs" depends="-load-properties" hidden="true">
         <php function="dirname" returnProperty="project.dir">
             <param value="${project.basedir}"/>
         </php>
-        <property name="build.dir" value="${project.dir}\build"/>
-        <property name="src.dir" value="${project.dir}\src"/>
-        <property name="docs.dir" value="${project.dir}\docs"/>
-        <property name="tests.dir" value="${project.dir}\tests"/>
-        <property name="examples.dir" value="${project.dir}\examples"/>
+        <property name="build.dir" value="${project.dir}/build"/>
+        <property name="src.dir" value="${project.dir}/src"/>
+        <property name="docs.dir" value="${project.dir}/docs"/>
+        <property name="tests.dir" value="${project.dir}/tests"/>
+        <property name="examples.dir" value="${project.dir}/examples"/>
 
         <echo message="Assigning build directories to properties" level="debug"/>
         <property name="build.api.dir" value="${build.dir}/api"/>
@@ -43,58 +55,55 @@
     </target>
 
     <target name="-setup-filesets" hidden="true">
-        <patternset id="php">
-            <include name="**/*.php"/>
-        </patternset>
-
-        <patternset id="tests">
-            <include name="**/*Test.php"/>
-        </patternset>
-
-        <patternset id="zip">
-            <exclude name="build.*"/>
-        </patternset>
-
-        <patternset id="doc">
-            <include name="README"/>
-            <include name="LICENSE"/>
-        </patternset>
-
         <fileset dir="${src.dir}" id="php.files">
-            <patternset refid="php"/>
+            <patternset>
+                <include name="**/*.php"/>
+            </patternset>
         </fileset>
 
         <fileset dir="${src.dir}" id="zip.files">
-            <patternset refid="zip"/>
+            <patternset>
+                <exclude name="build.*"/>
+            </patternset>
         </fileset>
 
         <fileset dir="${tests.dir}" id="test.files">
-            <patternset refid="tests"/>
+            <patternset>
+                <include name="**/*Test.php"/>
+            </patternset>
         </fileset>
 
         <fileset dir="${project.dir}" id="doc.files">
-            <patternset refid="doc"/>
+            <patternset>
+                <include name="README"/>
+                <include name="LICENSE"/>
+            </patternset>
         </fileset>
     </target>
 
-    <target name="clean" depends="init" unless="project.cleaned">
-        <echo message="Deleting build directories" level="debug"/>
-        <delete dir="${build.api.dir}"/>
-        <delete dir="${build.codebrowser.dir}"/>
-        <delete dir="${build.coverage.dir}"/>
-        <delete dir="${build.dist.dir}"/>
-        <delete dir="${build.logs.dir}"/>
-        <delete dir="${build.pdepend.dir}"/>
+    <target name="clean" depends="init">
+        <if>
+            <isfalse value="${project.cleaned}"/>
+            <then>
+                <echo message="Deleting build directories" level="debug"/>
+                <delete dir="${build.api.dir}"/>
+                <delete dir="${build.codebrowser.dir}"/>
+                <delete dir="${build.coverage.dir}"/>
+                <delete dir="${build.dist.dir}"/>
+                <delete dir="${build.logs.dir}"/>
+                <delete dir="${build.pdepend.dir}"/>
 
-        <echo message="Creating build directories" level="debug"/>
-        <mkdir dir="${build.api.dir}"/>
-        <mkdir dir="${build.codebrowser.dir}"/>
-        <mkdir dir="${build.coverage.dir}"/>
-        <mkdir dir="${build.dist.dir}"/>
-        <mkdir dir="${build.logs.dir}"/>
-        <mkdir dir="${build.pdepend.dir}"/>
+                <echo message="Creating build directories" level="debug"/>
+                <mkdir dir="${build.api.dir}"/>
+                <mkdir dir="${build.codebrowser.dir}"/>
+                <mkdir dir="${build.coverage.dir}"/>
+                <mkdir dir="${build.dist.dir}"/>
+                <mkdir dir="${build.logs.dir}"/>
+                <mkdir dir="${build.pdepend.dir}"/>
 
-        <property name="project.cleaned" value="true"/>
+                <property name="project.cleaned" value="true" override="true"/>
+            </then>
+        </if>
     </target>
 
     <target name="lint" depends="init" description="Check files for syntax errors">
@@ -105,7 +114,7 @@
 
     <target name="phploc" depends="init" description="Measure project size using PHPLOC">
         <phploc reportType="xml" reportDirectory="${build.logs.dir}" reportName="phploc">
-            <fileset dir="${src.dir}"/>
+            <fileset refid="php.files"/>
         </phploc>
     </target>
 
@@ -154,7 +163,7 @@
     </target>
 
     <target name="phpdoc" depends="init" description="Generate API documentation">
-        <phpdoc2 title="${phing.project.name} ${project.version}" destdir="${build.api.dir}" template="abstract">
+        <phpdoc2 title="${phing.project.name} ${project.version}" destdir="${build.api.dir}" template="responsive">
             <fileset refid="php.files"/>
         </phpdoc2>
     </target>
@@ -217,7 +226,7 @@
             <contributor name="David Coallier" email="davidc@agoraproduction.com" active="false"/>
             <contributor name="Tobias Schlitt" email="schlitt@php.net" active="false"/>
             <version release="${project.version}" api="${project.api.version}"/>
-            <stability release="beta" api="beta"/>
+            <stability release="stable" api="stable"/>
             <license>New BSD</license>
             <dirroles key="tests" value="test"/>
             <dirroles key="examples" value="doc"/>
@@ -234,6 +243,13 @@
                 <extension name="gd" type="optional"/>
             </dependencies>
 
+            <changelog version="1.0.0" api_version="1.0.0" date="2014-02-17" stability="stable" license="New BSD">
+                <!--        Don't exceed this width         -->
+                First stable release
+
+                * no changes since last beta release
+            </changelog>
+
             <changelog version="0.5.0" api_version="0.5.0" date="2013-08-07" stability="beta" license="New BSD">
                 <!--        Don't exceed this width         -->
                 First PHP5 release
@@ -243,6 +259,8 @@
                 * Bug #19858 Figlet: _createPhrase duplicates
                 parent method
                 * Bug #19891 undefined function init()
+                * Request #5055 Enhance _createCAPTCHA method
+                to use user-defined colours
                 * Request #19854 No reason for Figlet
                 double-options:
                 $options['options']['font_file']
@@ -365,7 +383,5 @@
                 Initial release (PHP World, Munich)
             </changelog>
         </d51pearpkg2>
-
-        <move file="${build.dist.temp.dir}/package.xml" todir="${build.dist.dir}"/>
     </target>
 </project>
