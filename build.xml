@@ -29,7 +29,7 @@
     <target name="init" depends="-load-properties, -setup-dirs, -setup-filesets" hidden="true"/>
 
     <target name="-load-properties" hidden="true">
-        <property name="project.version" value="1.0.0"/>
+        <property name="project.version" value="1.0.1"/>
         <property name="project.api.version" value="1.0.0"/>
     </target>
 
@@ -210,7 +210,7 @@
     </target>
 
     <target name="-generate-package-xml" depends="-copy-to-build" hidden="true">
-        <d51pearpkg2 dir="${build.dist.dir}" baseInstallDir="/" type="php">
+        <d51pearpkg2 dir="${build.dist.temp.dir}" baseInstallDir="/" type="php">
             <name>Text_CAPTCHA</name>
             <channel>pear.php.net</channel>
             <summary>Generation of CAPTCHAs</summary>
@@ -243,6 +243,12 @@
                 <package name="Image_Text" channel="pear.php.net" minimum_version="0.7.0" type="optional"/>
                 <extension name="gd" type="optional"/>
             </dependencies>
+
+            <changelog version="1.0.1" api_version="1.0.0" date="2014-02-17" stability="stable" license="New BSD">
+                <!--        Don't exceed this width         -->
+                * Bug #20201 license file does not exist,
+                causing error on upgrade.
+            </changelog>
 
             <changelog version="1.0.0" api_version="1.0.0" date="2014-02-17" stability="stable" license="New BSD">
                 <!--        Don't exceed this width         -->
@@ -384,5 +390,7 @@
                 Initial release (PHP World, Munich)
             </changelog>
         </d51pearpkg2>
+
+        <move file="${build.dist.temp.dir}/package.xml" todir="${build.dist.dir}"/>
     </target>
 </project>
