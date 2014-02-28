@@ -29,8 +29,7 @@
     <target name="init" depends="-load-properties, -setup-dirs, -setup-filesets" hidden="true"/>
 
     <target name="-load-properties" hidden="true">
-        <property name="project.version" value="1.0.1"/>
-        <property name="project.api.version" value="1.0.0"/>
+        <property name="project.version" value="1.0.2"/>
     </target>
 
     <target name="-setup-dirs" depends="-load-properties" hidden="true">
