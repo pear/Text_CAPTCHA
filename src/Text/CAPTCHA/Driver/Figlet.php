@@ -136,15 +136,14 @@ class Text_CAPTCHA_Driver_Figlet extends Text_CAPTCHA_Driver_Base
     public function createPhrase()
     {
         $options = $this->_textPasswordOptions;
-        $textPassword = new Text_Password();
         if (!is_array($options) || count($options) === 0) {
-            $this->setPhrase($textPassword->create($this->_length));
+            $this->setPhrase(Text_Password::create($this->_length));
         } else {
             if (count($options) === 1) {
-                $this->setPhrase($textPassword->create($this->_length, $options[0]));
+                $this->setPhrase(Text_Password::create($this->_length, $options[0]));
             } else {
                 $this->setPhrase(
-                    $textPassword->create($this->_length, $options[0], $options[1])
+                    Text_Password::create($this->_length, $options[0], $options[1])
                 );
             }
         }
