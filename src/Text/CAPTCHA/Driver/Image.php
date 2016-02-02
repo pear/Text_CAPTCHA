@@ -270,15 +270,14 @@ class Text_CAPTCHA_Driver_Image extends Text_CAPTCHA_Driver_Base
     {
         $len = intval(min(8, $this->_width / 25));
         $options = $this->_textPasswordOptions;
-        $textPassword = new Text_Password();
         if (!is_array($options) || count($options) === 0) {
-            $this->setPhrase($textPassword->create($len));
+            $this->setPhrase(Text_Password::create($len));
         } else {
             if (count($options) === 1) {
-                $this->setPhrase($textPassword->create($len, $options[0]));
+                $this->setPhrase(Text_Password::create($len, $options[0]));
             } else {
                 $this->setPhrase(
-                    $textPassword->create($len, $options[0], $options[1])
+                    Text_Password::create($len, $options[0], $options[1])
                 );
             }
         }

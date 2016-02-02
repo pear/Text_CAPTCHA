@@ -95,9 +95,8 @@ class Text_CAPTCHA_Driver_Word extends Text_CAPTCHA_Driver_Base
      */
     public function createPhrase()
     {
-        $phrase = new Text_Password();
         $this->setPhrase(
-            $phrase->create(
+            Text_Password::create(
                 $this->_length, 'unpronounceable', 'numeric'
             )
         );
