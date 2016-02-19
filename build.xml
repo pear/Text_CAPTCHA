@@ -1,223 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<project name="Text_CAPTCHA" basedir="." default="test">
+    <import file="base.xml" description="Basetasks" />
 
-<project name="Text_CAPTCHA" default="package" basedir="src">
-    <!--
-    Build.xml file for Text_CAPTCHA
-
-    Uses phing to create releases, and pear packages.
-
-    Requires the PearPackageV2 to be installed:
-
-    pear channel-discover bigmichi1.github.com/pear
-    pear install bigmichi1/Phing_PearPackageV2Task
-    -->
     <includepath classpath="${project.basedir}/src"/>
 
-    <property name="project.cleaned" value="false"/>
-    <property name="project.dir" value="${project.basedir}"/>
-
-    <taskdef classname="phing.tasks.ext.PearPackageV2Task" name="pearpackagev2"/>
-
-    <target name="package" depends="init, clean, verify, test, dist, docs" description="Do a full build"/>
-
-    <target name="verify" depends="init, clean, lint" description="Verify the quality of the code"/>
-
-    <target name="test" depends="init, clean, phploc, pdepend, phpmd, phpcs, phpcpd, phpunit" description="Do static analysis of the code"/>
-
-    <target name="docs" depends="init, clean, phpdoc, phpcb"/>
-
-    <target name="init" depends="-load-properties, -setup-dirs, -setup-filesets" hidden="true"/>
-
-    <target name="-load-properties" hidden="true">
-        <property name="project.version" value="1.0.2"/>
-    </target>
-
-    <target name="-setup-dirs" depends="-load-properties" hidden="true">
-        <php function="dirname" returnProperty="project.dir">
-            <param value="${project.basedir}"/>
-        </php>
-        <property name="build.dir" value="${project.dir}/build"/>
-        <property name="src.dir" value="${project.dir}/src"/>
-        <property name="docs.dir" value="${project.dir}/docs"/>
-        <property name="tests.dir" value="${project.dir}/tests"/>
-        <property name="examples.dir" value="${project.dir}/examples"/>
-
-        <echo message="Assigning build directories to properties" level="debug"/>
-        <property name="build.api.dir" value="${build.dir}/api"/>
-        <property name="build.codebrowser.dir" value="${build.dir}/code-browser"/>
-        <property name="build.coverage.dir" value="${build.dir}/coverage"/>
-        <property name="build.dist.dir" value="${build.dir}/dist"/>
-        <property name="build.logs.dir" value="${build.dir}/logs"/>
-        <property name="build.pdepend.dir" value="${build.dir}/pdepend"/>
-
-        <property name="build.dist.temp.dir" value="${build.dist.dir}/${phing.project.name}-${project.version}"/>
-    </target>
-
-    <target name="-setup-filesets" hidden="true">
-        <fileset dir="${src.dir}" id="php.files">
-            <patternset>
-                <include name="**/*.php"/>
-            </patternset>
-        </fileset>
-
-        <fileset dir="${src.dir}" id="zip.files">
-            <patternset>
-                <exclude name="build.*"/>
-            </patternset>
-        </fileset>
-
-        <fileset dir="${tests.dir}" id="test.files">
-            <patternset>
-                <include name="**/*Test.php"/>
-            </patternset>
-        </fileset>
-
-        <fileset dir="${project.dir}" id="doc.files">
-            <patternset>
-                <include name="README"/>
-                <include name="LICENSE"/>
-            </patternset>
-        </fileset>
-    </target>
-
-    <target name="clean" depends="init">
-        <if>
-            <isfalse value="${project.cleaned}"/>
-            <then>
-                <echo message="Deleting build directories" level="debug"/>
-                <delete dir="${build.api.dir}"/>
-                <delete dir="${build.codebrowser.dir}"/>
-                <delete dir="${build.coverage.dir}"/>
-                <delete dir="${build.dist.dir}"/>
-                <delete dir="${build.logs.dir}"/>
-                <delete dir="${build.pdepend.dir}"/>
-
-                <echo message="Creating build directories" level="debug"/>
-                <mkdir dir="${build.api.dir}"/>
-                <mkdir dir="${build.codebrowser.dir}"/>
-                <mkdir dir="${build.coverage.dir}"/>
-                <mkdir dir="${build.dist.dir}"/>
-                <mkdir dir="${build.logs.dir}"/>
-                <mkdir dir="${build.pdepend.dir}"/>
-
-                <property name="project.cleaned" value="true" override="true"/>
-            </then>
-        </if>
-    </target>
-
-    <target name="lint" depends="init" description="Check files for syntax errors">
-        <phplint haltonfailure="true" cachefile="${build.logs.dir}/cachefile.txt">
-            <fileset refid="php.files"/>
-        </phplint>
-    </target>
-
-    <target name="phploc" depends="init" description="Measure project size using PHPLOC">
-        <phploc reportType="xml" reportDirectory="${build.logs.dir}" reportName="phploc">
-            <fileset refid="php.files"/>
-        </phploc>
-    </target>
-
-    <target name="pdepend" depends="init" description="Calculate software metrics using PHP_Depend">
-        <phpdepend haltonerror="true">
-            <fileset refid="php.files"/>
-            <logger type="jdepend-xml" outfile="${build.logs.dir}/jdepend.xml"/>
-            <logger type="summary-xml" outfile="${build.logs.dir}/jdepend-summary.xml"/>
-            <logger type="jdepend-chart" outfile="${build.pdepend.dir}/dependencies.svg"/>
-            <logger type="phpunit-xml" outfile="${build.logs.dir}/metrics.xml"/>
-            <logger type="overview-pyramid" outfile="${build.pdepend.dir}/overview-pyramid.svg"/>
-            <analyzer type="coderank-mode" value="method"/>
-        </phpdepend>
-    </target>
-
-    <target name="phpmd" depends="init" description="Perform project mess detection using PHPMD">
-        <phpmd rulesets="codesize,design,naming,unusedcode">
-            <fileset refid="php.files"/>
-            <formatter type="xml" outfile="${build.logs.dir}/pmd.xml"/>
-        </phpmd>
-    </target>
-
-    <target name="phpcs" depends="init" description="Find coding standard violations using PHP_CodeSniffer">
-        <phpcodesniffer standard="PEAR" format="full" haltonerror="true" haltonwarning="true">
-            <fileset refid="php.files"/>
-            <formatter type="checkstyle" outfile="${build.logs.dir}/checkstyle.xml"/>
-        </phpcodesniffer>
-    </target>
-
-    <target name="phpcpd" depends="init" description="Find duplicate code using PHPCPD">
-        <phpcpd minLines="5" minTokens="20">
-            <fileset refid="php.files"/>
-            <formatter type="pmd" outfile="${build.logs.dir}/pmd-cpd.xml"/>
-        </phpcpd>
-    </target>
-
-    <target name="phpcb" depends="init" description="Aggregate tool output with PHP_CodeBrowser">
-        <exec executable="phpcb" logoutput="true" checkreturn="true" level="debug">
-            <arg value="--log"/>
-            <arg path="${build.logs.dir}"/>
-            <arg value="--source"/>
-            <arg path="${src.dir}"/>
-            <arg value="--output"/>
-            <arg path="${build.codebrowser.dir}"/>
-        </exec>
-    </target>
-
-    <target name="phpdoc" depends="init" description="Generate API documentation">
-        <phpdoc2 title="${phing.project.name} ${project.version}" destdir="${build.api.dir}" template="responsive">
-            <fileset refid="php.files"/>
-        </phpdoc2>
-    </target>
-
-    <target name="phpunit" depends="init" description="Run unit tests">
-        <coverage-setup database="${build.logs.dir}/coverage.db">
-            <fileset refid="php.files"/>
-        </coverage-setup>
-        <phpunit printsummary="true" haltonerror="true" haltonfailure="true" codecoverage="true">
-            <formatter todir="${build.logs.dir}" type="xml"/>
-            <batchtest>
-                <fileset refid="test.files"/>
-            </batchtest>
-        </phpunit>
-        <coverage-report outfile="${build.logs.dir}/coverage.xml">
-            <report usesorttable="true" toDir="${build.coverage.dir}" styleDir="${project.basedir}/../style"/>
-        </coverage-report>
-    </target>
-
-    <target name="dist" depends="init, clean, -generate-package-xml" description="Create distributable file">
-        <tar destfile="${build.dist.dir}/${phing.project.name}-${project.version}.tgz" compression="gzip">
-            <fileset dir="${build.dist.dir}/"/>
-        </tar>
-
-        <delete dir="${build.dist.temp.dir}"/>
-        <delete file="${build.dist.dir}/package.xml"/>
-    </target>
-
-    <target name="-copy-to-build" hidden="true">
-        <copy todir="${build.dist.temp.dir}" haltonerror="true">
-            <fileset refid="zip.files"/>
-        </copy>
-        <mkdir dir="${build.dist.temp.dir}/tests"/>
-        <copy todir="${build.dist.temp.dir}/tests" haltonerror="true">
-            <fileset dir="${tests.dir}"/>
-        </copy>
-        <mkdir dir="${build.dist.temp.dir}/examples"/>
-        <copy todir="${build.dist.temp.dir}/examples" haltonerror="true">
-            <fileset dir="${examples.dir}"/>
-        </copy>
-        <copy todir="${build.dist.temp.dir}" haltonerror="true">
-            <fileset refid="doc.files"/>
-        </copy>
-    </target>
+    <property name="project.version" value="1.1.0"/>
 
     <target name="-generate-package-xml" depends="-copy-to-build" hidden="true">
         <pearpackagev2 dir="${build.dist.temp.dir}" baseInstallDir="/" type="php">
             <name>Text_CAPTCHA</name>
-            <channel>pear.php.net</channel>
             <summary>Generation of CAPTCHAs</summary>
+            <channel>pear.php.net</channel>
             <description>
                 Implementation of CAPTCHAs (completely
                 automated public Turing test to tell computers
                 and humans apart)
             </description>
+
             <lead user="wenz" name="Christian Wenz" email="wenz@php.net" active="false"/>
             <lead user="bigmichi1" name="Michael Cramer" email="michael@bigmichi1.de"/>
             <contributor user="cweiske" name="Christian Weiske" email="cweiske@php.net" active="false"/>
@@ -225,33 +24,38 @@
             <contributor user="davidc" name="David Coallier" email="davidc@agoraproduction.com" active="false"/>
             <contributor user="toby" name="Tobias Schlitt" email="schlitt@php.net" active="false"/>
             <version release="${project.version}"/>
+
             <exceptions key="README" value="doc"/>
             <exceptions key="LICENSE" value="doc"/>
 
             <dependencies>
-                <php minimum="5.1.0"/>
-                <pear minimum="1.4.6"/>
-                <package name="Text_Password" channel="pear.php.net" minimum="1.1.1"/>
+                <php minimum="5.3.0"/>
+                <pear minimum="1.6.0"/>
+                <package name="Text_Password" channel="pear.php.net" minimum="1.2.0"/>
                 <package name="Numbers_Words" channel="pear.php.net" type="optional"/>
                 <package name="Text_Figlet" channel="pear.php.net" type="optional"/>
                 <package name="Image_Text" channel="pear.php.net" minimum="0.7.0" type="optional"/>
                 <extension name="gd" type="optional"/>
             </dependencies>
 
-            <changelog version="1.0.2" apiversion="1.0.0" date="2014-02-28" stability="stable" license="New BSD">
+            <changelog version="1.1.0" apiversion="1.0.0" date="2016-02-19" stability="stable" license="BSD-2-Clause">
                 * Fixed some invalid/broken tags in package.xml
             </changelog>
 
-            <changelog version="1.0.1" apiversion="1.0.0" date="2014-02-17" stability="stable" license="New BSD">
+            <changelog version="1.0.2" apiversion="1.0.0" date="2014-02-28" stability="stable" license="BSD-2-Clause">
+                * Fixed some invalid/broken tags in package.xml
+            </changelog>
+
+            <changelog version="1.0.1" apiversion="1.0.0" date="2014-02-17" stability="stable" license="BSD-2-Clause">
                 * Bug #20201 license file does not exist, causing error on upgrade.
             </changelog>
 
-            <changelog version="1.0.0" apiversion="1.0.0" date="2014-02-17" stability="stable" license="New BSD">
+            <changelog version="1.0.0" apiversion="1.0.0" date="2014-02-17" stability="stable" license="BSD-2-Clause">
                 First stable release
                 * no changes since last beta release
             </changelog>
 
-            <changelog version="0.5.0" apiversion="0.5.0" date="2013-08-07" stability="beta" license="New BSD">
+            <changelog version="0.5.0" apiversion="0.5.0" date="2013-08-07" stability="beta" license="BSD-2-Clause">
                 First PHP5 release
                 * use phing to build package
                 * extend test cases
@@ -262,14 +66,14 @@
                 * dependency for Image_Text to version 0.7.0
             </changelog>
 
-            <changelog version="0.4.1" apiversion="0.4.0" date="2010-10-25" stability="alpha" license="New BSD">
+            <changelog version="0.4.1" apiversion="0.4.0" date="2010-10-25" stability="alpha" license="BSD-2-Clause">
                 QA release
                 * Request #11653 Text_Password::create() call
                 * Bug #12578 incorrect/incomplete license in package.xml
                 * Request #16433 Image Driver: If image is too small, no text is created
             </changelog>
 
-            <changelog version="0.4.0" apiversion="0.4.0" date="2009-07-27" stability="alpha" license="New BSD">
+            <changelog version="0.4.0" apiversion="0.4.0" date="2009-07-27" stability="alpha" license="BSD-2-Clause">
                 + ** license change from PHP license to BSD license **
                 + implemented feature request #16433 (fixing behavior from bug #13478): If image is too small, no text is created (patch by tacker)
                 + implemented feature request #11653: new 'phraseOptions' setting to provide options to Text_Password::create() call
